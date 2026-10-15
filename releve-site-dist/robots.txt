@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://releve-courrier.com/sitemap.xml
