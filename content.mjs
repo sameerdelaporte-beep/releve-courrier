@@ -5,7 +5,7 @@ export const PLANS = [
   { id: 'pro', name: 'Pro', for: 'TPE, cabinets et associations', month: 29, year: 290, quota: 150, extra: '0,35 €', reco: true,
     feat: ['Tout Essentiel, plus :', 'Classement automatique et recherche plein texte', 'Règles par expéditeur', 'Réexpédition des originaux sur demande', 'Archives 5 ans, 5 utilisateurs'] },
   { id: 'entreprise', name: 'Entreprise', for: 'PME et équipes qui utilisent des agents IA', month: 89, year: 890, quota: 600, extra: '0,25 €',
-    feat: ['Tout Pro, plus :', 'API et webhooks à chaque pli', 'Extraction structurée : montant, échéance, IBAN…', 'Connexion Drive, SharePoint et agents IA', 'Archives 10 ans, utilisateurs illimités'] },
+    feat: ['Tout Pro, plus :', 'API et webhooks à chaque pli', 'Extraction structurée : montant, échéance, IBAN…', 'Accès par API pour vos agents IA', 'Archives 10 ans, utilisateurs illimités'] },
 ];
 
 export const MODES = {
@@ -119,7 +119,7 @@ ${steps(['Choisissez une formule sur la page <a href="/tarifs/">tarifs</a>.', 'I
 <h2>Ce que reçoivent vos agents</h2>
 ${li(['le PDF du pli, avec texte reconnu', 'le type de document, l’expéditeur, la date d’émission', 'les montants, échéances, références de contrat ou de facture, IBAN quand ils figurent sur le document', 'l’état du pli : numérisé, envoyé, original détruit, certificat de destruction'])}
 <div class="two">
-<div class="prose"><h2>Un webhook à chaque pli, une API pour l'historique</h2>${li(['webhook signé envoyé dès que le pli est numérisé', 'API pour retrouver un pli, son PDF et ses données', 'clés d’accès limitées : chaque agent ne lit que ce que vous autorisez', 'dépôt automatique dans Google Drive, SharePoint ou votre stockage'])}</div>
+<div class="prose"><h2>Un webhook à chaque pli, une API pour l'historique</h2>${li(['webhook signé envoyé dès que le pli est numérisé', 'API pour retrouver un pli, son PDF et ses données', 'clé d’API personnelle, régénérable à tout moment depuis votre espace', 'lien de téléchargement du PDF valable quelques minutes'])}</div>
 <pre class="code" aria-label="Exemple de données transmises pour un pli"><span class="k">{</span>
   <span class="k">"pli":</span> <span class="v">"RLV-2026-104582"</span>,
   <span class="k">"numerise_le":</span> <span class="v">"2026-10-08T11:15:00+02:00"</span>,

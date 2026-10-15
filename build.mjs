@@ -250,7 +250,7 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
 
 <section class="band"><div class="wrap two">
 <div class="prose"><p class="eyebrow">Pour vos agents IA</p><h2>Le courrier devient une donnée que vos agents peuvent lire</h2><p class="lead">Un PDF ne suffit pas à un agent. Relève extrait les informations utiles de chaque pli et les envoie dans un format structuré.</p>
-<ul class="ticks"><li>Expéditeur, type de document, montant, échéance, références de contrat</li><li>Webhook à chaque nouveau pli, API pour retrouver l’historique</li><li>Dépôt automatique dans Google Drive, SharePoint ou votre stockage</li></ul>
+<ul class="ticks"><li>Expéditeur, type de document, montant, échéance, références de contrat</li><li>Webhook à chaque nouveau pli, API pour retrouver l’historique</li><li>Clé d’API pour vos agents IA, PDF accessible par lien temporaire</li></ul>
 <a class="more" href="/dematerialisation-courrier-agents-ia/">Courrier papier pour agents IA</a></div>
 <pre class="code" aria-label="Exemple de données transmises pour un pli"><span class="k">{</span>
   <span class="k">"pli":</span> <span class="v">"RLV-2026-104582"</span>,

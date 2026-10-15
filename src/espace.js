@@ -146,6 +146,27 @@
     }).catch(function () { btn.disabled = false; btn.textContent = 'Indisponible'; });
   }
 
+  function fnUrl(name) { return SB + '/functions/v1/' + name; }
+  function openCertificate(id, btn) {
+    var w = window.open('', '_blank');
+    btn.disabled = true;
+    fetch(fnUrl('certificate') + '?item=' + encodeURIComponent(id), { headers: { apikey: KEY, Authorization: 'Bearer ' + session.access_token } })
+      .then(function (r) { if (!r.ok) throw new Error('cert'); return r.blob(); })
+      .then(function (b) { btn.disabled = false; var u = URL.createObjectURL(b); if (w) w.location = u; else window.location = u; })
+      .catch(function () { btn.disabled = false; if (w) w.close(); btn.textContent = 'Indisponible'; });
+  }
+  function notify(body) {
+    return fetch(fnUrl('notify'), { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + session.access_token, 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return {}; }); }).catch(function () { return { error: 'réseau' }; });
+  }
+  function notifyText(res) {
+    if (!res || res.error) return 'Notification impossible.';
+    var out = [];
+    if (res.email === true) out.push('email envoyé'); else if (res.email === false) out.push('email NON envoyé (clé Resend à configurer ?)');
+    if (typeof res.webhook === 'number') out.push('webhook : HTTP ' + res.webhook); else if (typeof res.webhook === 'string' && res.webhook.indexOf('erreur') === 0) out.push('webhook en échec');
+    return out.length ? out.join(' · ') : '';
+  }
+
   function badge(text, kind) { return h('span', { class: 'badge ' + (kind || '') }, [text]); }
 
   /* ---------- Espace client ---------- */
@@ -168,6 +189,7 @@
       var c = rows[0];
       body.appendChild(accountCard(c));
       body.appendChild(prefsCard(c));
+      if (c.plan === 'entreprise' && c.status === 'active') body.appendChild(apiCard(c));
       var itemsBox = h('div', { class: 'app-card' }, [h('h3', { text: 'Mes plis' }), h('p', { class: 'muted', text: 'Chargement…' })]);
       body.appendChild(itemsBox);
       api('/rest/v1/mail_items?select=*&order=received_at.desc,created_at.desc&limit=200').then(function (r) { return r.ok ? json(r) : []; }).then(function (items) {
@@ -228,6 +250,57 @@
     return h('div', { class: 'app-card' }, [h('h3', { text: 'Préférences de traitement' }), form]);
   }
 
+  function apiCard(c) {
+    var keyBox = h('div', {});
+    var prefix = h('span', { class: 'mono', text: '…' });
+    var msg = h('p', { class: 'note', role: 'status' });
+    api('/rest/v1/rpc/my_api_key_prefix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(json).then(function (p) { prefix.textContent = (typeof p === 'string' && p) ? p + '…' : 'aucune clé'; });
+    var gen = h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () {
+      if (!window.confirm('Générer une nouvelle clé ? L’ancienne cessera de fonctionner immédiatement.')) return;
+      gen.disabled = true;
+      api('/rest/v1/rpc/rotate_api_key', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(json).then(function (k) {
+        gen.disabled = false; clear(keyBox);
+        if (typeof k === 'string' && k.indexOf('rlv_live_') === 0) {
+          prefix.textContent = k.slice(0, 13) + '…';
+          keyBox.appendChild(h('p', { class: 'note', text: 'Copiez cette clé maintenant : elle ne sera plus affichée.' }));
+          keyBox.appendChild(h('pre', { class: 'mono codebox', text: k }));
+        } else msg.textContent = 'Génération impossible.';
+      }).catch(function () { gen.disabled = false; msg.textContent = 'Génération impossible.'; });
+    } }, ['Générer une nouvelle clé']);
+
+    var url = h('input', { id: 'wh-url', type: 'url', value: c.webhook_url || '', placeholder: 'https://votre-systeme.fr/webhooks/releve' });
+    var secretBox = h('div', {});
+    function showSecret(sec) { clear(secretBox); if (sec) { secretBox.appendChild(h('p', { class: 'legend', text: 'Secret de signature' })); secretBox.appendChild(h('pre', { class: 'mono codebox', text: sec })); } }
+    showSecret(c.webhook_secret);
+    var save = h('button', { class: 'btn btn-primary btn-sm', type: 'submit' }, ['Enregistrer le webhook']);
+    var whMsg = h('p', { class: 'note', role: 'status' });
+    var form = h('form', { novalidate: 'novalidate', class: 'form-grid' }, [
+      h('div', { class: 'field' }, [h('label', { for: 'wh-url' }, ['URL du webhook (https)']), url, h('p', { class: 'hint', text: 'Laissez vide pour désactiver. Un POST JSON signé est envoyé à chaque changement d’état d’un pli.' })]),
+      h('div', {}, [save]), whMsg, secretBox
+    ]);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = url.value.trim();
+      if (v && !/^https:\/\/[^\s]+$/.test(v)) { whMsg.textContent = 'L’URL doit commencer par https://'; return; }
+      save.disabled = true; whMsg.textContent = 'Enregistrement…';
+      api('/rest/v1/rpc/set_webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_url: v || null }) }).then(json).then(function (sec) {
+        save.disabled = false; whMsg.textContent = v ? 'Webhook enregistré.' : 'Webhook désactivé.'; showSecret(typeof sec === 'string' ? sec : null);
+      }).catch(function () { save.disabled = false; whMsg.textContent = 'Enregistrement impossible.'; });
+    });
+    var doc = 'curl ' + SB + '/functions/v1/api/v1/items \\\n  -H "Authorization: Bearer rlv_live_…"\n\n' +
+      '# Un pli (avec pdf_url valable 10 min)\ncurl ' + SB + '/functions/v1/api/v1/items/{id} -H "Authorization: Bearer rlv_live_…"\n\n' +
+      '# Paramètres de liste : limit (1-100), status, before (ISO 8601)\n' +
+      '# Webhook : en-tête Releve-Signature: t=<horodatage>,v1=<HMAC-SHA256 hex de "<t>.<corps>" avec le secret>';
+    return h('div', { class: 'app-card' }, [
+      h('h3', { text: 'API et webhooks' }),
+      h('p', { class: 'muted', text: 'Donnez à vos outils et agents IA l’accès à vos plis : expéditeur, type, montant, échéance, IBAN, PDF.' }),
+      h('dl', { class: 'kvs' }, [kv('Clé d’API', prefix)]),
+      h('div', { class: 'hero-actions' }, [gen]), keyBox, msg,
+      h('h4', { text: 'Webhook' }), form,
+      h('h4', { text: 'Exemples' }), h('pre', { class: 'mono codebox', text: doc })
+    ]);
+  }
+
   function renderItems(box, items) {
     clear(box);
     box.appendChild(h('h3', { text: 'Mes plis' }));
@@ -237,15 +310,16 @@
     }
     var rows = items.map(function (it) {
       var dl = it.pdf_path ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function (e) { openPdf(it.pdf_path, e.currentTarget); } }, ['Télécharger']) : h('span', { class: 'muted', text: '—' });
+      var cert = it.certificate_ref ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Télécharger le certificat de destruction', onclick: function (e) { openCertificate(it.id, e.currentTarget); } }, [it.certificate_ref]) : h('span', { class: 'muted', text: '—' });
       return h('tr', {}, [
         h('td', { text: fmtDate(it.received_at) }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }),
         h('td', { text: fmtEur(it.amount_ttc) }), h('td', { text: fmtDate(it.due_date) }),
         h('td', {}, [badge(STATUS_ITEM[it.status] || it.status)]),
-        h('td', { class: 'mono', text: it.certificate_ref || '—' }), h('td', {}, [dl])
+        h('td', {}, [cert]), h('td', {}, [dl]), h('td', { text: fmtDate(it.expires_at) })
       ]);
     });
     box.appendChild(h('div', { class: 'tablewrap' }, [h('table', {}, [
-      h('thead', {}, [h('tr', {}, ['Reçu le', 'Expéditeur', 'Type', 'Montant TTC', 'Échéance', 'Statut', 'Certificat', 'PDF'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
+      h('thead', {}, [h('tr', {}, ['Reçu le', 'Expéditeur', 'Type', 'Montant TTC', 'Échéance', 'Statut', 'Certificat', 'PDF', 'Conservé jusqu’au'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
       h('tbody', {}, rows)
     ])]));
   }
@@ -259,13 +333,27 @@
     api('/rest/v1/admins?select=email').then(function (r) { return r.ok ? json(r) : null; }).then(function (a) {
       clear(body);
       if (!a || !a.length) { body.appendChild(h('div', { class: 'app-card' }, [h('h3', { text: 'Accès réservé' }), h('p', { class: 'muted', text: 'Ce compte n’est pas autorisé à gérer le courrier.' })])); return; }
-      return api('/rest/v1/customers?select=id,reference,company,name,email,plan,status&order=created_at.desc').then(json).then(function (customers) {
+      return api('/rest/v1/customers?select=id,reference,company,name,email,plan,status,welcome_sent_at&order=created_at.desc').then(json).then(function (customers) {
         var list = h('div', { class: 'app-card' }, [h('h3', { text: 'Derniers plis déposés' }), h('p', { class: 'muted', text: 'Chargement…' })]);
         body.appendChild(depositForm(customers || [], function () { loadAdminItems(list); }));
         body.appendChild(list);
         loadAdminItems(list);
+        body.appendChild(customersCard(customers || []));
       });
     }).catch(function () { clear(body); body.appendChild(h('p', { class: 'note', text: 'Chargement impossible.' })); });
+  }
+
+  function customersCard(customers) {
+    var rows = customers.map(function (c) {
+      var msg = h('span', { class: 'muted', text: c.welcome_sent_at ? 'Accueil envoyé le ' + fmtDate(c.welcome_sent_at) : 'Accueil non envoyé' });
+      var b = h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () {
+        b.disabled = true; msg.textContent = 'Envoi…';
+        notify({ event: 'welcome', customer_id: c.id }).then(function (res) { b.disabled = false; msg.textContent = res && res.email === true ? 'Email d’accueil envoyé.' : 'Envoi impossible (clé Resend ?).'; });
+      } }, ['Renvoyer l’email d’accueil']);
+      return h('tr', {}, [h('td', { class: 'mono', text: c.reference }), h('td', { text: c.company || c.name || c.email }), h('td', { text: (PLAN[c.plan] || c.plan) }), h('td', {}, [badge(STATUS_CUSTOMER[c.status] || c.status, c.status === 'active' ? 'ok' : 'warn')]), h('td', {}, [msg]), h('td', {}, [b])]);
+    });
+    return h('div', { class: 'app-card' }, [h('h3', { text: 'Clients' }),
+      rows.length ? h('div', { class: 'tablewrap' }, [h('table', {}, [h('thead', {}, [h('tr', {}, ['Référence', 'Client', 'Formule', 'Statut', 'Email d’accueil', ''].map(function (t) { return h('th', { scope: 'col', text: t }); }))]), h('tbody', {}, rows)])]) : h('p', { class: 'muted', text: 'Aucun client pour le moment.' })]);
   }
 
   function opt(v, t) { return h('option', { value: v }, [t]); }
@@ -285,9 +373,10 @@
       h('div', { class: 'row' }, [field('received', 'Reçu le', h('input', { type: 'date', value: today })), field('sender', 'Expéditeur', h('input', { type: 'text', maxlength: '120' }))]),
       h('div', { class: 'row' }, [field('type', 'Type de document', types), field('treatment', 'Traitement demandé', treat)]),
       h('div', { class: 'row3b' }, [field('amount', 'Montant TTC (€)', h('input', { type: 'number', step: '0.01', min: '0', inputmode: 'decimal' })), field('due', 'Échéance', h('input', { type: 'date' })), field('pages', 'Pages', h('input', { type: 'number', min: '1', step: '1' }))]),
+      h('div', { class: 'row' }, [field('reference', 'Référence du document', h('input', { type: 'text', maxlength: '80' }), 'N° de facture, de contrat…'), field('iban', 'IBAN', h('input', { type: 'text', maxlength: '40', autocomplete: 'off' }))]),
       h('div', { class: 'row' }, [field('status', 'Statut', status), field('file', 'PDF numérisé', h('input', { type: 'file', accept: 'application/pdf' }), '20 Mo maximum. Facultatif pour un pli détruit fermé.')]),
       field('notes', 'Note interne', h('input', { type: 'text', maxlength: '300' })),
-      h('p', { class: 'hint', text: 'L’envoi automatique par email n’est pas encore branché : le pli est déposé dans l’espace du client, à vous de lui envoyer le PDF si sa consigne est « email ».' }),
+      h('p', { class: 'hint', text: 'À l’enregistrement, le client est prévenu par email (PDF joint si sa consigne est « email ») et son webhook est appelé s’il est en formule Entreprise.' }),
       h('div', {}, [btn]), msg
     ]);
     form.addEventListener('submit', function (e) {
@@ -309,30 +398,39 @@
           doc_type: types.value, treatment: treat.value, status: status.value, pdf_path: path,
           amount_ttc: f.amount.value === '' ? null : Number(f.amount.value), due_date: f.due.value || null,
           pages: f.pages.value === '' ? null : parseInt(f.pages.value, 10), notes: f.notes.value.trim() || null,
+          reference: f.reference.value.trim() || null, iban: f.iban.value.replace(/\s+/g, '').toUpperCase() || null,
           scanned_at: file ? new Date().toISOString() : null
         };
         return api('/rest/v1/mail_items', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(row) });
       }).then(function (r) {
-        btn.disabled = false;
-        if (!r.ok) { msg.textContent = 'Le pli n’a pas pu être enregistré.'; return; }
-        msg.textContent = 'Pli déposé.';
-        f.sender.value = ''; f.amount.value = ''; f.due.value = ''; f.pages.value = ''; f.notes.value = ''; f.file.value = '';
-        onDone();
+        if (!r.ok) { btn.disabled = false; msg.textContent = 'Le pli n’a pas pu être enregistré.'; return; }
+        msg.textContent = 'Pli déposé. Notification en cours…';
+        return notify({ item_id: id }).then(function (res) {
+          btn.disabled = false;
+          msg.textContent = 'Pli déposé' + (notifyText(res) ? ' · ' + notifyText(res) : '') + '.';
+          f.reference.value = ''; f.iban.value = '';
+          f.sender.value = ''; f.amount.value = ''; f.due.value = ''; f.pages.value = ''; f.notes.value = ''; f.file.value = '';
+          onDone();
+        });
       }).catch(function () { btn.disabled = false; msg.textContent = 'Dépôt impossible. Réessayez.'; });
     });
     return h('div', { class: 'app-card' }, [h('h3', { text: 'Déposer un pli numérisé' }), form]);
   }
 
-  function loadAdminItems(box) {
+  function loadAdminItems(box, info) {
     api('/rest/v1/mail_items?select=*,customers(reference,company,name)&order=created_at.desc&limit=50').then(function (r) { return r.ok ? json(r) : []; }).then(function (items) {
       clear(box); box.appendChild(h('h3', { text: 'Derniers plis déposés' }));
+      if (info) box.appendChild(h('p', { class: 'note', role: 'status', text: 'Notification : ' + info }));
       if (!items || !items.length) { box.appendChild(h('p', { class: 'muted', text: 'Aucun pli déposé.' })); return; }
       var rows = items.map(function (it) {
         var sel = h('select', { 'aria-label': 'Statut du pli' }, Object.keys(STATUS_ITEM).map(function (k) { return h('option', { value: k, selected: k === it.status ? 'selected' : false }, [STATUS_ITEM[k]]); }));
         sel.addEventListener('change', function () {
           sel.disabled = true;
           api('/rest/v1/mail_items?id=eq.' + encodeURIComponent(it.id), { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ status: sel.value }) })
-            .then(function () { sel.disabled = false; loadAdminItems(box); }).catch(function () { sel.disabled = false; });
+            .then(function (r) {
+              if (!r.ok) { sel.disabled = false; return; }
+              return notify({ item_id: it.id }).then(function (res) { sel.disabled = false; loadAdminItems(box, notifyText(res)); });
+            }).catch(function () { sel.disabled = false; });
         });
         var cust = it.customers ? it.customers.reference + ' · ' + (it.customers.company || it.customers.name || '') : '—';
         return h('tr', {}, [h('td', { text: fmtDate(it.received_at) }), h('td', { text: cust }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }), h('td', {}, [sel]), h('td', { class: 'mono', text: it.certificate_ref || '—' })]);
