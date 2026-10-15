@@ -371,7 +371,6 @@ const legal = (p, title, h1, inner) => {
   const body = `<section class="page-hero"><div class="wrap page-body"><h1>${h1}</h1><div class="prose">${inner}</div></div></section>`;
   emit(p, layout({ p, title: `${title} | Relève`, desc: `${h1} du site Relève.`, body, ld: [orgLd], index: false }), { index: false });
 };
-legal('/confidentialite/', 'Politique de confidentialité', 'Politique de confidentialité', `<p class="muted">Texte à compléter avant la mise en ligne définitive.</p><h2>Données traitées</h2><p>Relève traite les données nécessaires à l’abonnement (identité, coordonnées, facturation) et le contenu du courrier numérisé pour le compte de ses clients, en qualité de sous-traitant.</p><h2>Vos droits</h2><p>Vous pouvez demander l’accès, la rectification, l’export ou la suppression de vos données. Contact : ${cfg.contactEmail}.</p>`);
 
 
 
@@ -463,6 +462,53 @@ legal('/cgv/', 'Conditions générales de vente', 'Conditions générales de ven
 
 <h2>12. Droit applicable et juridiction</h2>
 <p>Les CGV sont soumises au droit français. En cas de litige avec un client professionnel, et à défaut d’accord amiable, les tribunaux du ressort de Versailles sont seuls compétents. Pour un consommateur, les règles légales de compétence s’appliquent.</p>`);
+
+
+legal('/confidentialite/', 'Politique de confidentialité', 'Politique de confidentialité', `
+<p class="muted">Dernière mise à jour : ${UPDATED}.</p>
+<h2>1. Qui est responsable de vos données ?</h2>
+<p>${LG('editor')}, ${ADDR}, exploite le service Relève. Contact pour toute question sur vos données : <a href="mailto:${MAIL}">${MAIL}</a>.</p>
+<p>Relève a deux rôles distincts :</p>
+<ul>
+<li><strong>Responsable de traitement</strong> pour les données de gestion de votre compte et de votre abonnement (identité, coordonnées, facturation, connexion).</li>
+<li><strong>Sous-traitant</strong> (article 28 du RGPD) pour le contenu de votre courrier : vous restez responsable de traitement des données que contiennent vos documents, et Relève ne les traite que sur vos instructions.</li>
+</ul>
+<h2>2. Données traitées, finalités et bases légales</h2>
+<div class="tablewrap"><table><thead><tr><th scope="col">Données</th><th scope="col">Finalité</th><th scope="col">Base légale</th></tr></thead><tbody>
+<tr><td>Nom, société, email, téléphone, adresse de facturation, formule, préférences de traitement</td><td>Gérer l’abonnement et fournir le service</td><td>Exécution du contrat</td></tr>
+<tr><td>Données de paiement (traitées par Stripe ; Relève ne voit pas le numéro de carte)</td><td>Encaissement, facturation</td><td>Exécution du contrat</td></tr>
+<tr><td>Courrier reçu et numérisé : expéditeur, type, montant, échéance, références, contenu du PDF</td><td>Numériser, classer, transmettre, détruire ou réexpédier le courrier</td><td>Exécution du contrat (Relève agit pour votre compte)</td></tr>
+<tr><td>Email de connexion, jeton de session</td><td>Authentifier l’accès à l’espace client</td><td>Exécution du contrat, sécurité</td></tr>
+<tr><td>Factures et pièces comptables</td><td>Obligations comptables et fiscales</td><td>Obligation légale</td></tr>
+<tr><td>Messages envoyés à l’adresse de contact</td><td>Répondre à vos demandes</td><td>Intérêt légitime</td></tr>
+</tbody></table></div>
+<h2>3. Destinataires et sous-traitants</h2>
+<p>Vos données sont accessibles aux seules personnes habilitées de Relève et à ces prestataires, choisis pour leurs garanties :</p>
+<ul>
+<li><strong>Supabase</strong> : base de données, authentification et stockage des PDF, hébergés dans l’Union européenne (Francfort).</li>
+<li><strong>Stripe</strong> : paiement et facturation des abonnements.</li>
+<li><strong>Netlify</strong> : hébergement du site (pages publiques, sans contenu de courrier).</li>
+<li><strong>Hostinger</strong> : nom de domaine et messagerie (envoi des emails de service).</li>
+<li><strong>Google Fonts</strong> : chargement des polices du site ; votre adresse IP est transmise à Google à cette occasion.</li>
+</ul>
+<p>Relève ne vend pas vos données et ne les utilise ni pour de la publicité ni pour entraîner des modèles d’intelligence artificielle. Certains prestataires (Stripe, Netlify, Google) peuvent traiter des données hors de l’Union européenne ; ces transferts sont encadrés par les clauses contractuelles types de la Commission européenne ou le cadre de protection des données UE–États-Unis.</p>
+<h2>4. Durées de conservation</h2>
+<ul>
+<li><strong>Copies numériques du courrier</strong> : 12 mois (Essentiel), 5 ans (Pro) ou 10 ans (Entreprise) à compter de la réception, puis suppression automatique.</li>
+<li><strong>Original papier</strong> : détruit après numérisation, sauf réexpédition ou conservation demandée.</li>
+<li><strong>Données de compte</strong> : pendant l’abonnement, puis 30 jours après sa fin pour vous permettre de récupérer vos documents, avant suppression.</li>
+<li><strong>Factures</strong> : 10 ans (obligation comptable).</li>
+<li><strong>Messages de contact</strong> : 3 ans à compter du dernier échange.</li>
+</ul>
+<h2>5. Sécurité et confidentialité</h2>
+<p>Les PDF sont stockés dans un espace privé, accessibles uniquement via un lien temporaire à usage unique pour le client concerné. Chaque client ne peut consulter que ses propres plis (contrôle d’accès au niveau de la base de données). Les échanges sont chiffrés (HTTPS), la connexion se fait par lien envoyé par email sans mot de passe, et les clés d’API de la formule Entreprise sont stockées sous forme chiffrée irréversible. Le courrier est traité dans le respect du secret des correspondances.</p>
+<h2>6. Vos droits</h2>
+<p>Vous disposez des droits d’accès, de rectification, d’effacement, de limitation, d’opposition et de portabilité de vos données, ainsi que du droit de définir des directives sur leur sort après votre décès. Pour les exercer : <a href="mailto:${MAIL}">${MAIL}</a>. Nous répondons sous un mois. Si les données concernées figurent dans le courrier d’un de nos clients, nous vous orienterons vers ce client, responsable de traitement.</p>
+<p>Vous pouvez introduire une réclamation auprès de la CNIL : <a href="https://www.cnil.fr" rel="noopener">cnil.fr</a> (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07).</p>
+<h2>7. Cookies et traceurs</h2>
+<p>Le site n’utilise ni cookie publicitaire ni outil de mesure d’audience. Une donnée technique (jeton de session) est enregistrée dans le navigateur lors de la connexion à l’espace client, strictement nécessaire à son fonctionnement et exemptée de consentement.</p>
+<h2>8. Accord de sous-traitance</h2>
+<p>Les clients qui le souhaitent peuvent obtenir un accord de sous-traitance (DPA) détaillant les mesures de sécurité et les sous-traitants ultérieurs : <a href="mailto:${MAIL}">${MAIL}</a>.</p>`);
 
 /* ---------- Espace client et opérateur (non indexés) ---------- */
 const SB_URL = cfg.supabase.url;
