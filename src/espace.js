@@ -162,7 +162,7 @@
   function notifyText(res) {
     if (!res || res.error) return 'Notification impossible.';
     var out = [];
-    if (res.email === true) out.push('email envoyé'); else if (res.email === false) out.push('email NON envoyé (clé Resend à configurer ?)');
+    if (res.email === true) out.push('email envoyé'); else if (res.email === false) out.push('email NON envoyé (mot de passe SMTP à configurer ?)');
     if (typeof res.webhook === 'number') out.push('webhook : HTTP ' + res.webhook); else if (typeof res.webhook === 'string' && res.webhook.indexOf('erreur') === 0) out.push('webhook en échec');
     return out.length ? out.join(' · ') : '';
   }
@@ -348,7 +348,7 @@
       var msg = h('span', { class: 'muted', text: c.welcome_sent_at ? 'Accueil envoyé le ' + fmtDate(c.welcome_sent_at) : 'Accueil non envoyé' });
       var b = h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () {
         b.disabled = true; msg.textContent = 'Envoi…';
-        notify({ event: 'welcome', customer_id: c.id }).then(function (res) { b.disabled = false; msg.textContent = res && res.email === true ? 'Email d’accueil envoyé.' : 'Envoi impossible (clé Resend ?).'; });
+        notify({ event: 'welcome', customer_id: c.id }).then(function (res) { b.disabled = false; msg.textContent = res && res.email === true ? 'Email d’accueil envoyé.' : 'Envoi impossible (SMTP ?).'; });
       } }, ['Renvoyer l’email d’accueil']);
       return h('tr', {}, [h('td', { class: 'mono', text: c.reference }), h('td', { text: c.company || c.name || c.email }), h('td', { text: (PLAN[c.plan] || c.plan) }), h('td', {}, [badge(STATUS_CUSTOMER[c.status] || c.status, c.status === 'active' ? 'ok' : 'warn')]), h('td', {}, [msg]), h('td', {}, [b])]);
     });

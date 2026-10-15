@@ -1,6 +1,11 @@
-// Envoi d'emails via Resend (https://resend.com). Secrets : RESEND_API_KEY, MAIL_FROM (facultatif).
-const KEY = Deno.env.get("RESEND_API_KEY") ?? "";
-const FROM = Deno.env.get("MAIL_FROM") ?? "Relève <contact@releve-courrier.com>";
+// Envoi d'emails par SMTP via la boîte Hostinger. Secrets : SMTP_PASSWORD (obligatoire),
+// SMTP_USER (défaut contact@releve-courrier.com), SMTP_HOST (défaut smtp.hostinger.com), SMTP_PORT (défaut 465).
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+
+const USER = Deno.env.get("SMTP_USER") ?? "contact@releve-courrier.com";
+const PASS = Deno.env.get("SMTP_PASSWORD") ?? "";
+const HOST = Deno.env.get("SMTP_HOST") ?? "smtp.hostinger.com";
+const PORT = Number(Deno.env.get("SMTP_PORT") ?? "465");
 export const SITE = "https://releve-courrier.com";
 export const ADDRESS = ["2 bis rue Hardy", "78000 Versailles"];
 
@@ -16,14 +21,25 @@ export type Mail = {
 };
 
 export async function sendMail(m: Mail): Promise<boolean> {
-  if (!KEY) { console.error("RESEND_API_KEY manquante : email non envoyé"); return false; }
-  const r = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM, to: m.to, reply_to: "contact@releve-courrier.com", subject: m.subject, html: m.html, text: m.text, attachments: m.attachments }),
-  });
-  if (!r.ok) { console.error("resend", r.status, await r.text()); return false; }
-  return true;
+  if (!PASS) { console.error("SMTP_PASSWORD manquant : email non envoyé"); return false; }
+  const client = new SMTPClient({ connection: { hostname: HOST, port: PORT, tls: true, auth: { username: USER, password: PASS } } });
+  try {
+    await client.send({
+      from: `Relève <${USER}>`,
+      to: m.to,
+      replyTo: USER,
+      subject: m.subject,
+      content: m.text,
+      html: m.html,
+      attachments: m.attachments?.map((a) => ({ filename: a.filename, content: a.content, encoding: "base64", contentType: "application/pdf" })),
+    });
+    return true;
+  } catch (e) {
+    console.error("smtp", (e as Error)?.message ?? e);
+    return false;
+  } finally {
+    try { await client.close(); } catch { /* ignore */ }
+  }
 }
 
 function shell(title: string, inner: string): string {
