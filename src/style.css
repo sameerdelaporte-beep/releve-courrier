@@ -269,3 +269,4 @@ footer{padding-block:48px 32px;color:var(--ink-2);font-size:.9rem;border-top:1px
 .note[role=status]:empty{display:none}
 .codebox{background:var(--bg-soft,#f4f1ea);border:1px solid var(--line,#d9d4c8);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:pre;font-size:.82rem;line-height:1.5;max-width:100%;margin:8px 0}
 .app-card h4{margin:20px 0 6px;font-size:1rem}
+.tbd{background:#fff3b0;color:#5a4a00;padding:0 4px;border-radius:3px}

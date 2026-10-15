@@ -26,5 +26,15 @@
     "2 bis rue Hardy",
     "78000 Versailles"
   ],
-  "contactEmail": "contact@releve-courrier.com"
+  "contactEmail": "contact@releve-courrier.com",
+  "legal": {
+    "editor": "",
+    "status": "",
+    "siren": "",
+    "vat": "",
+    "capital": "",
+    "director": "",
+    "mediator": "",
+    "phone": ""
+  }
 }

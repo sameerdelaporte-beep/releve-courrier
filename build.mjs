@@ -371,10 +371,98 @@ const legal = (p, title, h1, inner) => {
   const body = `<section class="page-hero"><div class="wrap page-body"><h1>${h1}</h1><div class="prose">${inner}</div></div></section>`;
   emit(p, layout({ p, title: `${title} | Relève`, desc: `${h1} du site Relève.`, body, ld: [orgLd], index: false }), { index: false });
 };
-legal('/mentions-legales/', 'Mentions légales', 'Mentions légales', `<p class="muted">Informations à compléter avant la mise en ligne définitive.</p><h2>Éditeur du site</h2><p>Dénomination : [à compléter]<br>Forme juridique et capital : [à compléter]<br>SIREN / SIRET : [à compléter]<br>Adresse : Relève Courrier, 2 bis rue Hardy, 78000 Versailles<br>Directeur de la publication : [à compléter]<br>Contact : ${cfg.contactEmail}</p><h2>Hébergement</h2><p>Netlify, Inc., 512 2nd Street, Suite 200, San Francisco, CA 94107, États-Unis.</p>`);
-legal('/cgv/', 'Conditions générales de vente', 'Conditions générales de vente', `<p class="muted">Texte à faire valider par un professionnel du droit avant la mise en ligne définitive.</p><h2>Objet</h2><p>Les présentes conditions encadrent l’abonnement au service Relève de réception, numérisation, envoi, destruction ou réexpédition de courrier.</p><h2>Prix et paiement</h2><p>Les prix sont indiqués hors taxes. La TVA applicable est ajoutée au paiement, qui s’effectue par Stripe.</p><h2>Durée et résiliation</h2><p>En formule mensuelle, l’abonnement est sans engagement et la résiliation prend effet à la fin du mois en cours.</p><h2>Responsabilité</h2><p>[à compléter]</p>`);
 legal('/confidentialite/', 'Politique de confidentialité', 'Politique de confidentialité', `<p class="muted">Texte à compléter avant la mise en ligne définitive.</p><h2>Données traitées</h2><p>Relève traite les données nécessaires à l’abonnement (identité, coordonnées, facturation) et le contenu du courrier numérisé pour le compte de ses clients, en qualité de sous-traitant.</p><h2>Vos droits</h2><p>Vous pouvez demander l’accès, la rectification, l’export ou la suppression de vos données. Contact : ${cfg.contactEmail}.</p>`);
 
+
+
+const TBD = '<span class="tbd">[à compléter]</span>';
+const LG = (k) => (cfg.legal && cfg.legal[k] && String(cfg.legal[k]).trim()) ? esc(String(cfg.legal[k]).trim()) : TBD;
+const UPDATED = '15 octobre 2026';
+const MAIL = esc(cfg.contactEmail);
+const ADDR = esc((cfg.receptionAddress || []).join(', '));
+
+legal('/mentions-legales/', 'Mentions légales', 'Mentions légales', `
+<p class="muted">Dernière mise à jour : ${UPDATED}.</p>
+<h2>Éditeur du site</h2>
+<p>Le site <strong>releve-courrier.com</strong> est édité par :<br>
+Dénomination ou nom : ${LG('editor')}<br>
+Statut : ${LG('status')} (entrepreneur individuel, société, etc.)<br>
+SIREN : ${LG('siren')}<br>
+Capital social (le cas échéant) : ${LG('capital')}<br>
+N° de TVA intracommunautaire : ${LG('vat')}<br>
+Adresse : Relève Courrier, ${ADDR}<br>
+Email : <a href="mailto:${MAIL}">${MAIL}</a><br>
+Téléphone : ${LG('phone')}</p>
+<p>Directeur de la publication : ${LG('director')}.</p>
+<h2>Hébergement et prestataires techniques</h2>
+<ul>
+<li><strong>Hébergement du site</strong> : Netlify, Inc., 512 2nd Street, Suite 200, San Francisco, CA 94107, États-Unis. <a href="https://www.netlify.com" rel="noopener">netlify.com</a></li>
+<li><strong>Base de données et stockage des fichiers</strong> : Supabase, Inc., hébergés dans l’Union européenne (Francfort, Allemagne).</li>
+<li><strong>Paiement en ligne</strong> : Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Dublin 2, Irlande. Relève ne conserve aucune donnée de carte bancaire.</li>
+<li><strong>Nom de domaine et messagerie</strong> : Hostinger International Ltd.</li>
+<li><strong>Polices de caractères</strong> : Google Fonts (Google Ireland Limited).</li>
+</ul>
+<h2>Propriété intellectuelle</h2>
+<p>Les textes, graphismes, logos et éléments du site sont la propriété de l’éditeur ou utilisés avec autorisation. Toute reproduction, représentation ou réutilisation, totale ou partielle, sans accord écrit préalable est interdite.</p>
+<h2>Données personnelles et cookies</h2>
+<p>Le traitement des données personnelles est décrit dans la <a href="/confidentialite/">politique de confidentialité</a>. Le site n’utilise pas de cookie publicitaire ni de traceur de mesure d’audience ; seul le navigateur du client connecté conserve une session technique dans son espace client.</p>
+<h2>Responsabilité</h2>
+<p>L’éditeur s’efforce de fournir des informations exactes et à jour, sans garantie d’exhaustivité. Les informations du site ne constituent pas un conseil juridique, fiscal ou comptable. L’éditeur ne saurait être tenu responsable de l’usage fait de ces informations, ni du contenu des sites tiers vers lesquels le site renvoie.</p>
+<h2>Droit applicable</h2>
+<p>Le site est soumis au droit français. Pour toute question ou signalement de contenu : <a href="mailto:${MAIL}">${MAIL}</a>.</p>`);
+
+legal('/cgv/', 'Conditions générales de vente', 'Conditions générales de vente', `
+<p class="muted">Version du ${UPDATED}.</p>
+<h2>1. Identité du prestataire</h2>
+<p>Les présentes conditions générales de vente (« CGV ») régissent les services proposés sous la marque <strong>Relève</strong> par ${LG('editor')}, ${LG('status')}, SIREN ${LG('siren')}, dont l’adresse est ${ADDR} (« Relève »). Contact : <a href="mailto:${MAIL}">${MAIL}</a>.</p>
+<p>Elles s’appliquent à toute souscription à un abonnement effectuée sur le site releve-courrier.com par un client, professionnel ou consommateur (« le Client »). La souscription vaut acceptation sans réserve des CGV, que le Client reconnaît avoir lues avant son paiement.</p>
+
+<h2>2. Description du service</h2>
+<p>Relève reçoit à son adresse le courrier postal destiné au Client (adressé « c/o Relève » avec la référence client), l’ouvre, le numérise en PDF, puis le traite selon la consigne du Client : mise à disposition dans l’espace client, envoi par email, envoi par API et webhook (formule Entreprise), réexpédition de l’original ou destruction.</p>
+<ul>
+<li><strong>Délai de numérisation</strong> : au plus tard 24 heures ouvrées après la réception du pli par Relève. Il s’agit d’un objectif de service, hors jours fériés et fermetures exceptionnelles.</li>
+<li><strong>Destruction</strong> : l’original papier est détruit par broyage après numérisation, sauf si le Client a demandé sa réexpédition ou sa conservation. Un certificat de destruction numéroté est mis à disposition dans l’espace client.</li>
+<li><strong>Conservation des copies numériques</strong> : 12 mois (Essentiel), 5 ans (Pro) ou 10 ans (Entreprise) à compter de la réception du pli. Passé ce délai, les copies sont supprimées automatiquement.</li>
+<li><strong>Quota</strong> : chaque formule inclut un nombre de plis par mois (30, 150 ou 600). Les plis supplémentaires sont facturés au tarif indiqué sur la page <a href="/tarifs/">Tarifs</a>.</li>
+</ul>
+<p>Relève <strong>n’est pas une société de domiciliation</strong> : l’adresse c/o Relève ne peut pas servir de siège social ni d’adresse d’immatriculation. La copie numérique est une copie : elle n’a pas valeur d’archivage probant certifié.</p>
+
+<h2>3. Mandat donné à Relève</h2>
+<p>En souscrivant, le Client donne à Relève mandat exprès de réceptionner, d’ouvrir, de lire pour les besoins de la numérisation et du classement, de numériser, de transmettre, de détruire ou de réexpédier le courrier qui lui est adressé, conformément à ses consignes. Le Client garantit être habilité à donner ce mandat, y compris, pour une société, au nom de celle-ci, et pour tout courrier adressé à des tiers dont il serait mandataire.</p>
+<p>Relève traite le courrier de façon confidentielle, dans le respect du secret des correspondances. L’accès aux contenus est limité aux personnes habilitées, et aucun contenu n’est utilisé à d’autres fins que l’exécution du service.</p>
+
+<h2>4. Courrier exclu</h2>
+<p>Ne sont pas pris en charge : les colis et envois volumineux, les produits dangereux, illicites ou périssables, ainsi que le courrier adressé à une personne non couverte par l’abonnement. Les chèques, moyens de paiement, pièces d’identité, titres, actes et documents originaux à valeur juridique ne sont jamais détruits : ils sont conservés ou réexpédiés au Client selon la procédure convenue. Relève peut refuser ou retourner à l’expéditeur tout courrier non conforme.</p>
+<p>Les lettres recommandées sont signées par Relève au nom du Client, qui en autorise expressément la réception. Le délai légal de retrait court à compter de la présentation à l’adresse de Relève, et non de la date de consultation par le Client.</p>
+
+<h2>5. Prix et facturation</h2>
+<p>Les prix sont indiqués en euros, <strong>hors taxes</strong>. La TVA au taux en vigueur est ajoutée lors du paiement. Les tarifs applicables sont ceux affichés sur le site au jour de la souscription. Relève peut les modifier ; toute modification est notifiée au Client par email au moins 30 jours avant son application et ne s’applique qu’au renouvellement suivant.</p>
+<p>Le paiement s’effectue par carte bancaire via la plateforme sécurisée Stripe, à la souscription puis à chaque échéance (mensuelle ou annuelle). Une facture est mise à disposition par Stripe et dans le portail de facturation. En cas d’échec de paiement, Relève peut suspendre le service après relance, et le résilier si l’impayé persiste.</p>
+<p>Pour les clients professionnels, tout retard de paiement entraîne de plein droit des pénalités calculées sur la base de trois fois le taux d’intérêt légal, ainsi qu’une indemnité forfaitaire de 40 € pour frais de recouvrement (articles L. 441-10 et D. 441-5 du Code de commerce).</p>
+
+<h2>6. Durée, renouvellement et résiliation</h2>
+<p>L’abonnement est conclu pour un mois ou un an selon la formule choisie, et se renouvelle tacitement pour une durée identique. Le Client peut le résilier à tout moment depuis son espace client (portail de facturation) ou par email. La résiliation prend effet à la fin de la période de facturation en cours ; le service reste disponible jusqu’à cette date. Aucun remboursement au prorata n’est dû pour la période en cours, sauf disposition légale contraire.</p>
+<p>À la fin de l’abonnement, le courrier reçu ensuite n’est plus traité. Le Client dispose de 30 jours pour télécharger ses documents ; passé ce délai, ses données sont supprimées, sauf obligation légale de conservation. Relève peut résilier l’abonnement pour manquement grave du Client (usage illicite, impayé, courrier exclu répété), après mise en demeure restée sans effet pendant 8 jours.</p>
+
+<h2>7. Droit de rétractation des consommateurs</h2>
+<p>Lorsque le Client est un consommateur (personne physique agissant à des fins étrangères à son activité professionnelle), il dispose d’un délai de <strong>14 jours</strong> à compter de la souscription pour se rétracter, sans avoir à motiver sa décision, en écrivant à <a href="mailto:${MAIL}">${MAIL}</a>, en indiquant sa référence client et sa volonté de se rétracter.</p>
+<p>Le Client consommateur demande expressément que le service commence dès la souscription. S’il se rétracte, il paie la part du service déjà fournie jusqu’à la communication de sa décision, calculée au prorata du prix de l’abonnement (article L. 221-25 du Code de la consommation) ; le surplus est remboursé sous 14 jours par le même moyen de paiement. Le droit de rétractation ne s’applique pas aux clients professionnels, sauf si le contrat n’entre pas dans le champ de leur activité principale et que leur effectif est de cinq salariés au plus.</p>
+
+<h2>8. Responsabilité</h2>
+<p>Relève est tenue d’une obligation de moyens. Elle n’est responsable que des dommages directs, certains et prévisibles résultant d’un manquement à ses obligations, notamment en cas de perte, de destruction non demandée ou de divulgation d’un pli sous sa garde. Sa responsabilité est plafonnée, pour les clients professionnels, au montant des sommes payées par le Client au cours des 12 derniers mois, et exclut les préjudices indirects (perte d’exploitation, de chance, d’image, de clientèle). Ces limites ne s’appliquent pas en cas de faute lourde ou dolosive, ni pour les dommages corporels, ni à l’égard des consommateurs lorsque la loi l’interdit.</p>
+<p>Relève n’est pas responsable des retards ou de l’indisponibilité résultant d’un cas de force majeure, d’une défaillance du réseau postal, d’un prestataire tiers ou d’une information erronée communiquée par le Client. Le Client reste responsable du contenu de son courrier et de l’exactitude de la consigne qu’il donne, et doit informer ses expéditeurs de son adresse.</p>
+
+<h2>9. Données personnelles</h2>
+<p>Pour les contenus du courrier numérisé, Relève agit comme sous-traitant du Client, qui est responsable de traitement ; pour les données de gestion de l’abonnement, Relève est responsable de traitement. Les modalités, les destinataires, les durées de conservation et les droits des personnes sont précisés dans la <a href="/confidentialite/">politique de confidentialité</a>. Un accord de sous-traitance (article 28 du RGPD) est disponible sur demande à <a href="mailto:${MAIL}">${MAIL}</a>.</p>
+
+<h2>10. Réclamations et médiation</h2>
+<p>Toute réclamation peut être adressée à <a href="mailto:${MAIL}">${MAIL}</a>. Relève s’engage à répondre sous 15 jours. Le Client consommateur peut recourir gratuitement au médiateur de la consommation dont relève Relève : ${LG('mediator')}, ainsi qu’à la plateforme européenne de règlement en ligne des litiges.</p>
+
+<h2>11. Modification des CGV</h2>
+<p>Relève peut modifier les CGV à tout moment. Les CGV applicables sont celles en vigueur à la date de la souscription ou du dernier renouvellement ; les modifications sont notifiées par email 30 jours avant leur entrée en vigueur, et le Client peut résilier avant cette date.</p>
+
+<h2>12. Droit applicable et juridiction</h2>
+<p>Les CGV sont soumises au droit français. En cas de litige avec un client professionnel, et à défaut d’accord amiable, les tribunaux du ressort de Versailles sont seuls compétents. Pour un consommateur, les règles légales de compétence s’appliquent.</p>`);
 
 /* ---------- Espace client et opérateur (non indexés) ---------- */
 const SB_URL = cfg.supabase.url;
