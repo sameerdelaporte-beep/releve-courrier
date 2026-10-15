@@ -1,0 +1,30 @@
+{
+  "siteUrl": "https://releve-courrier.com",
+  "brand": "Relève",
+  "stripeMode": "test",
+  "paymentLinks": {
+    "essentiel": {
+      "mensuel": "https://buy.stripe.com/test_00w4gyeFXcPCaIB15R24000",
+      "annuel": "https://buy.stripe.com/test_7sYbJ01Tb5na03X3dZ24001"
+    },
+    "pro": {
+      "mensuel": "https://buy.stripe.com/test_14A00i2Xf9DqeYRg0L24002",
+      "annuel": "https://buy.stripe.com/test_fZucN41Tb4j6aIB15R24003"
+    },
+    "entreprise": {
+      "mensuel": "https://buy.stripe.com/test_aFaaEW8hz02Q03X6qb24004",
+      "annuel": "https://buy.stripe.com/test_cNi28qcxPg1O9ExcOz24005"
+    }
+  },
+  "supabase": {
+    "url": "https://rsmhehnceccopsnxhklh.supabase.co",
+    "publishableKey": "sb_publishable__68IQgSrf448Yf0tDPpVxw_M7M10S87"
+  },
+  "portalUrl": "https://billing.stripe.com/p/login/test_00w4gyeFXcPCaIB15R24000",
+  "receptionAddress": [
+    "Relève Courrier",
+    "2 bis rue Hardy",
+    "78000 Versailles"
+  ],
+  "contactEmail": "contact@releve-courrier.com"
+}
