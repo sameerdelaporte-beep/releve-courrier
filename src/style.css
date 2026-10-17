@@ -258,8 +258,8 @@ footer{padding-block:48px 32px;color:var(--ink-2);font-size:.9rem;border-top:1px
 .badge.warn{background:var(--warn-soft);color:var(--warn)}
 .field{display:grid;gap:6px;min-width:0}
 .field label{font-weight:600;font-size:.9rem}
-.field input,.field select{font:400 1rem var(--f-body);color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:8px;padding:.7rem .8rem;width:100%;min-width:0}
-.field input:focus,.field select:focus{outline:none;border-color:var(--stamp)}
+.field input,.field select,.field textarea{font:400 1rem var(--f-body);color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:8px;padding:.7rem .8rem;width:100%;min-width:0}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--stamp)}
 .hint{font-size:.82rem;color:var(--ink-2)}
 .form-grid,.login-form{display:grid;gap:16px}
 .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
@@ -270,3 +270,8 @@ footer{padding-block:48px 32px;color:var(--ink-2);font-size:.9rem;border-top:1px
 .codebox{background:var(--bg-soft,#f4f1ea);border:1px solid var(--line,#d9d4c8);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:pre;font-size:.82rem;line-height:1.5;max-width:100%;margin:8px 0}
 .app-card h4{margin:20px 0 6px;font-size:1rem}
 .tbd{background:#fff3b0;color:#5a4a00;padding:0 4px;border-radius:3px}
+
+.searchbar{display:grid;grid-template-columns:1fr;gap:.6rem;margin:.5rem 0 1rem}
+.searchbar input,.searchbar select{font:400 1rem var(--f-body);color:var(--ink);background:var(--paper);border:1.5px solid var(--rule);border-radius:8px;padding:.7rem .8rem;width:100%;min-width:0}
+@media(min-width:700px){.searchbar{grid-template-columns:1fr 14rem auto}}
+.team-row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin:.35rem 0}

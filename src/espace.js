@@ -167,6 +167,7 @@
     return out.length ? out.join(' · ') : '';
   }
 
+  function opt(v, t) { return h('option', { value: v }, [t]); }
   function badge(text, kind) { return h('span', { class: 'badge ' + (kind || '') }, [text]); }
 
   /* ---------- Espace client ---------- */
@@ -176,9 +177,16 @@
     var body = h('div', { class: 'app-body' }, [h('p', { class: 'muted', text: 'Chargement…' })]);
     root.appendChild(body);
 
+    var me = String(email).toLowerCase();
     api('/rest/v1/customers?select=*&limit=1').then(function (r) { return r.ok ? json(r) : null; }).then(function (rows) {
+      if (rows && rows.length) return { c: rows[0], member: false };
+      return api('/rest/v1/rpc/member_account', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+        .then(function (r) { return r.ok ? json(r) : null; }).then(function (m) {
+          return m && m.length ? { c: m[0], member: true } : null;
+        });
+    }).then(function (res) {
       clear(body);
-      if (!rows || !rows.length) {
+      if (!res) {
         body.appendChild(h('div', { class: 'app-card' }, [
           h('h3', { text: 'Aucun abonnement associé à cette adresse' }),
           h('p', { class: 'muted', text: 'Connectez-vous avec l’email utilisé lors du paiement. Si vous venez de souscrire, patientez une minute puis rechargez la page.' }),
@@ -186,18 +194,153 @@
         ]));
         return;
       }
-      var c = rows[0];
-      body.appendChild(accountCard(c));
-      body.appendChild(prefsCard(c));
-      if (c.plan === 'entreprise' && c.status === 'active') body.appendChild(apiCard(c));
-      var itemsBox = h('div', { class: 'app-card' }, [h('h3', { text: 'Mes plis' }), h('p', { class: 'muted', text: 'Chargement…' })]);
+      var c = res.c, member = res.member;
+      var active = c.status === 'active';
+      var advanced = (c.plan === 'pro' || c.plan === 'entreprise');
+      if (member) {
+        body.appendChild(h('div', { class: 'app-card' }, [
+          h('h3', { text: (c.company || c.name || 'Compte') + ' · ' + (PLAN[c.plan] || c.plan) }),
+          h('p', { class: 'muted', text: 'Vous consultez ce compte en tant qu’utilisateur invité par ' + c.owner_email + '. Référence client : ' + c.reference + '.' })
+        ]));
+      } else {
+        body.appendChild(accountCard(c));
+        body.appendChild(prefsCard(c));
+        if (c.plan === 'entreprise' && active) body.appendChild(apiCard(c));
+        if (advanced && active) { body.appendChild(rulesCard(c)); body.appendChild(teamCard(c)); }
+      }
+      var itemsBox = h('div', { class: 'app-card' });
       body.appendChild(itemsBox);
-      api('/rest/v1/mail_items?select=*&order=received_at.desc,created_at.desc&limit=200').then(function (r) { return r.ok ? json(r) : []; }).then(function (items) {
-        renderItems(itemsBox, items || []);
-      });
+      itemsPanel(itemsBox, advanced);
     }).catch(function () {
       clear(body); body.appendChild(h('p', { class: 'note', text: 'Impossible de charger vos données. Réessayez dans un instant.' }));
     });
+  }
+
+  /* Liste des plis : recherche plein texte et dossiers (formules Pro et Entreprise) */
+  function itemsPanel(box, advanced) {
+    var state = { q: '', folder: '' };
+    var holder = h('div', {});
+    var q = h('input', { type: 'search', placeholder: 'Rechercher : expéditeur, référence, contenu…', 'aria-label': 'Rechercher dans mes plis', maxlength: '100' });
+    var folderSel = h('select', { 'aria-label': 'Dossier' }, [opt('', 'Tous les dossiers')]);
+    var go = h('button', { class: 'btn btn-ghost btn-sm', type: 'submit' }, ['Rechercher']);
+    var bar = h('form', { class: 'searchbar', role: 'search', novalidate: 'novalidate' }, [q, folderSel, go]);
+    bar.addEventListener('submit', function (e) { e.preventDefault(); state.q = q.value.trim(); state.folder = folderSel.value; load(); });
+    folderSel.addEventListener('change', function () { state.folder = folderSel.value; load(); });
+    function load() {
+      var url = '/rest/v1/mail_items?select=*&order=received_at.desc,created_at.desc&limit=200';
+      if (state.q) url += '&search=wfts(french).' + encodeURIComponent(state.q.replace(/[(),]/g, ' '));
+      if (state.folder) url += '&folder=eq.' + encodeURIComponent(state.folder);
+      holder.textContent = 'Chargement…';
+      api(url).then(function (r) { return r.ok ? json(r) : []; }).then(function (items) {
+        renderItems(holder, items || [], !!(state.q || state.folder));
+      }).catch(function () { holder.textContent = 'Chargement impossible.'; });
+    }
+    box.appendChild(h('h3', { text: 'Mes plis' }));
+    if (advanced) {
+      box.appendChild(bar);
+      api('/rest/v1/mail_items?select=folder&folder=not.is.null&limit=1000').then(function (r) { return r.ok ? json(r) : []; }).then(function (rows) {
+        var seen = {};
+        (rows || []).forEach(function (x) { if (x.folder) seen[x.folder] = 1; });
+        Object.keys(seen).sort().forEach(function (f) { folderSel.appendChild(opt(f, f)); });
+      });
+    }
+    box.appendChild(holder);
+    load();
+  }
+
+  /* Règles par expéditeur */
+  function rulesCard(c) {
+    var list = h('div', {});
+    var msg = h('p', { class: 'note', role: 'status' });
+    function loadRules() {
+      api('/rest/v1/mail_rules?select=*&order=created_at.asc').then(function (r) { return r.ok ? json(r) : []; }).then(function (rules) {
+        clear(list);
+        if (!rules || !rules.length) { list.appendChild(h('p', { class: 'muted', text: 'Aucune règle. Sans règle, vos plis sont classés par type et par année (ex. Factures › 2026) et traités selon vos préférences.' })); return; }
+        var rows = rules.map(function (ru) {
+          var cond = [ru.sender_contains ? 'expéditeur contient « ' + ru.sender_contains + ' »' : null, ru.doc_type ? 'type : ' + (DOC[ru.doc_type] || ru.doc_type) : null].filter(Boolean).join(' et ');
+          var act = [ru.set_folder ? 'dossier « ' + ru.set_folder + ' »' : null, ru.set_treatment ? TREATMENT[ru.set_treatment] : null].filter(Boolean).join(' · ');
+          var del = h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () {
+            if (!window.confirm('Supprimer la règle « ' + ru.name + ' » ?')) return;
+            api('/rest/v1/mail_rules?id=eq.' + encodeURIComponent(ru.id), { method: 'DELETE' }).then(loadRules);
+          } }, ['Supprimer']);
+          return h('tr', {}, [h('td', { text: ru.name }), h('td', { text: cond }), h('td', { text: act }), h('td', {}, [del])]);
+        });
+        list.appendChild(h('div', { class: 'tablewrap' }, [h('table', {}, [
+          h('thead', {}, [h('tr', {}, ['Règle', 'Si', 'Alors', ''].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
+          h('tbody', {}, rows)])]));
+      });
+    }
+    var name = h('input', { type: 'text', maxlength: '80', placeholder: 'Factures EDF', id: 'ru-name' });
+    var sender = h('input', { type: 'text', maxlength: '80', placeholder: 'EDF', id: 'ru-sender' });
+    var dtype = h('select', { id: 'ru-type' }, [opt('', 'Tous les types')].concat(Object.keys(DOC).map(function (k) { return opt(k, DOC[k]); })));
+    var folder = h('input', { type: 'text', maxlength: '80', placeholder: 'Énergie › 2026', id: 'ru-folder' });
+    var treat = h('select', { id: 'ru-treat' }, [opt('', 'Traitement inchangé')].concat(Object.keys(TREATMENT).map(function (k) { return opt(k, TREATMENT[k]); })));
+    var btn = h('button', { class: 'btn btn-primary btn-sm', type: 'submit' }, ['Ajouter la règle']);
+    function fld(id, label, node) { return h('div', { class: 'field' }, [h('label', { for: id }, [label]), node]); }
+    var form = h('form', { novalidate: 'novalidate', class: 'form-grid' }, [
+      fld('ru-name', 'Nom de la règle', name),
+      h('div', { class: 'row' }, [fld('ru-sender', 'Si l’expéditeur contient', sender), fld('ru-type', 'et le type est', dtype)]),
+      h('div', { class: 'row' }, [fld('ru-folder', 'Classer dans le dossier', folder), fld('ru-treat', 'Traiter par', treat)]),
+      h('div', {}, [btn]), msg
+    ]);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var row = { customer_id: c.id, name: name.value.trim(), sender_contains: sender.value.trim() || null, doc_type: dtype.value || null, set_folder: folder.value.trim() || null, set_treatment: treat.value || null };
+      if (!row.name) { msg.textContent = 'Donnez un nom à la règle.'; return; }
+      if (!row.sender_contains && !row.doc_type) { msg.textContent = 'Indiquez un expéditeur ou un type de document.'; return; }
+      if (row.sender_contains && row.sender_contains.length < 2) { msg.textContent = 'L’expéditeur doit contenir au moins 2 caractères.'; return; }
+      if (!row.set_folder && !row.set_treatment) { msg.textContent = 'Choisissez un dossier ou un traitement.'; return; }
+      btn.disabled = true; msg.textContent = 'Enregistrement…';
+      api('/rest/v1/mail_rules', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(row) }).then(function (r) {
+        btn.disabled = false;
+        if (!r.ok) { msg.textContent = 'Enregistrement impossible.'; return; }
+        msg.textContent = 'Règle ajoutée. Elle s’applique aux prochains plis (la première règle correspondante l’emporte).';
+        name.value = ''; sender.value = ''; folder.value = ''; dtype.value = ''; treat.value = ''; loadRules();
+      }).catch(function () { btn.disabled = false; msg.textContent = 'Enregistrement impossible.'; });
+    });
+    loadRules();
+    return h('div', { class: 'app-card' }, [h('h3', { text: 'Règles par expéditeur' }),
+      h('p', { class: 'muted', text: 'Classez ou orientez automatiquement chaque pli selon son expéditeur ou son type. Exemple : « EDF » → dossier Énergie, envoi par email.' }), list, h('h4', { text: 'Nouvelle règle' }), form]);
+  }
+
+  /* Utilisateurs supplémentaires */
+  function teamCard(c) {
+    var max = c.plan === 'pro' ? 4 : null;
+    var list = h('div', {});
+    var msg = h('p', { class: 'note', role: 'status' });
+    function loadTeam() {
+      api('/rest/v1/team_members?select=*&order=created_at.asc').then(function (r) { return r.ok ? json(r) : []; }).then(function (ms) {
+        clear(list);
+        if (!ms || !ms.length) { list.appendChild(h('p', { class: 'muted', text: 'Vous êtes le seul utilisateur.' })); return; }
+        ms.forEach(function (m) {
+          var del = h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () {
+            if (!window.confirm('Retirer l’accès de ' + m.email + ' ?')) return;
+            api('/rest/v1/team_members?id=eq.' + encodeURIComponent(m.id), { method: 'DELETE' }).then(loadTeam);
+          } }, ['Retirer']);
+          list.appendChild(h('p', { class: 'team-row' }, [h('span', { text: m.email + ' ' }), del]));
+        });
+      });
+    }
+    var email = h('input', { id: 'tm-email', type: 'email', placeholder: 'collegue@exemple.fr', autocomplete: 'off' });
+    var btn = h('button', { class: 'btn btn-primary btn-sm', type: 'submit' }, ['Inviter']);
+    var form = h('form', { novalidate: 'novalidate', class: 'form-grid' }, [
+      h('div', { class: 'field' }, [h('label', { for: 'tm-email' }, ['Email du collègue']), email, h('p', { class: 'hint', text: 'Il se connecte avec cet email (lien de connexion) et consulte vos plis et leurs PDF, en lecture seule.' })]),
+      h('div', {}, [btn]), msg
+    ]);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = email.value.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { msg.textContent = 'Adresse email invalide.'; return; }
+      btn.disabled = true; msg.textContent = 'Ajout…';
+      api('/rest/v1/team_members', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ customer_id: c.id, email: v }) }).then(function (r) {
+        btn.disabled = false;
+        if (r.ok) { msg.textContent = 'Utilisateur ajouté.'; email.value = ''; loadTeam(); return; }
+        return json(r).then(function (j) { msg.textContent = (j && j.message) ? j.message : (r.status === 409 ? 'Cet utilisateur existe déjà.' : 'Ajout impossible.'); });
+      }).catch(function () { btn.disabled = false; msg.textContent = 'Ajout impossible.'; });
+    });
+    loadTeam();
+    return h('div', { class: 'app-card' }, [h('h3', { text: 'Utilisateurs' }),
+      h('p', { class: 'muted', text: max ? 'Formule Pro : jusqu’à ' + (max + 1) + ' utilisateurs, vous compris.' : 'Formule Entreprise : utilisateurs illimités.' }), list, form]);
   }
 
   function kv(label, valueNode) { return h('div', { class: 'kv' }, [h('dt', { text: label }), h('dd', {}, [valueNode])]); }
@@ -289,7 +432,7 @@
     });
     var doc = 'curl ' + SB + '/functions/v1/api/v1/items \\\n  -H "Authorization: Bearer rlv_live_…"\n\n' +
       '# Un pli (avec pdf_url valable 10 min)\ncurl ' + SB + '/functions/v1/api/v1/items/{id} -H "Authorization: Bearer rlv_live_…"\n\n' +
-      '# Paramètres de liste : limit (1-100), status, before (ISO 8601)\n' +
+      '# Paramètres de liste : limit (1-100), status, folder, q (recherche plein texte), before (ISO 8601)\n' +
       '# Webhook : en-tête Releve-Signature: t=<horodatage>,v1=<HMAC-SHA256 hex de "<t>.<corps>" avec le secret>';
     return h('div', { class: 'app-card' }, [
       h('h3', { text: 'API et webhooks' }),
@@ -301,25 +444,24 @@
     ]);
   }
 
-  function renderItems(box, items) {
+  function renderItems(box, items, filtered) {
     clear(box);
-    box.appendChild(h('h3', { text: 'Mes plis' }));
     if (!items.length) {
-      box.appendChild(h('p', { class: 'muted', text: 'Aucun pli pour le moment. Vos plis numérisés apparaîtront ici dès leur réception.' }));
+      box.appendChild(h('p', { class: 'muted', text: filtered ? 'Aucun pli ne correspond à cette recherche.' : 'Aucun pli pour le moment. Vos plis numérisés apparaîtront ici dès leur réception.' }));
       return;
     }
     var rows = items.map(function (it) {
       var dl = it.pdf_path ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function (e) { openPdf(it.pdf_path, e.currentTarget); } }, ['Télécharger']) : h('span', { class: 'muted', text: '—' });
       var cert = it.certificate_ref ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Télécharger le certificat de destruction', onclick: function (e) { openCertificate(it.id, e.currentTarget); } }, [it.certificate_ref]) : h('span', { class: 'muted', text: '—' });
       return h('tr', {}, [
-        h('td', { text: fmtDate(it.received_at) }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }),
+        h('td', { text: fmtDate(it.received_at) }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }), h('td', { text: it.folder || '—' }),
         h('td', { text: fmtEur(it.amount_ttc) }), h('td', { text: fmtDate(it.due_date) }),
         h('td', {}, [badge(STATUS_ITEM[it.status] || it.status)]),
         h('td', {}, [cert]), h('td', {}, [dl]), h('td', { text: fmtDate(it.expires_at) })
       ]);
     });
     box.appendChild(h('div', { class: 'tablewrap' }, [h('table', {}, [
-      h('thead', {}, [h('tr', {}, ['Reçu le', 'Expéditeur', 'Type', 'Montant TTC', 'Échéance', 'Statut', 'Certificat', 'PDF', 'Conservé jusqu’au'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
+      h('thead', {}, [h('tr', {}, ['Reçu le', 'Expéditeur', 'Type', 'Dossier', 'Montant TTC', 'Échéance', 'Statut', 'Certificat', 'PDF', 'Conservé jusqu’au'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
       h('tbody', {}, rows)
     ])]));
   }
@@ -356,14 +498,12 @@
       rows.length ? h('div', { class: 'tablewrap' }, [h('table', {}, [h('thead', {}, [h('tr', {}, ['Référence', 'Client', 'Formule', 'Statut', 'Email d’accueil', ''].map(function (t) { return h('th', { scope: 'col', text: t }); }))]), h('tbody', {}, rows)])]) : h('p', { class: 'muted', text: 'Aucun client pour le moment.' })]);
   }
 
-  function opt(v, t) { return h('option', { value: v }, [t]); }
-
   function depositForm(customers, onDone) {
     var f = {};
     function field(id, label, node, hint) { f[id] = node; node.id = 'd-' + id; return h('div', { class: 'field' }, [h('label', { for: 'd-' + id }, [label]), node, hint ? h('p', { class: 'hint', text: hint }) : null]); }
     var custSel = h('select', {}, [opt('', customers.length ? 'Choisir un client' : 'Aucun client')].concat(customers.map(function (c) { return opt(c.id, c.reference + ' · ' + (c.company || c.name || c.email)); })));
     var types = h('select', {}, Object.keys(DOC).map(function (k) { return opt(k, DOC[k]); }));
-    var treat = h('select', {}, Object.keys(TREATMENT).map(function (k) { return opt(k, TREATMENT[k]); }));
+    var treat = h('select', {}, [opt('', 'Selon les règles et préférences du client')].concat(Object.keys(TREATMENT).map(function (k) { return opt(k, TREATMENT[k]); })));
     var status = h('select', {}, Object.keys(STATUS_ITEM).map(function (k) { return h('option', { value: k, selected: k === 'numerise' ? 'selected' : false }, [STATUS_ITEM[k]]); }));
     var today = new Date().toISOString().slice(0, 10);
     var msg = h('p', { class: 'note', role: 'status' });
@@ -375,7 +515,9 @@
       h('div', { class: 'row3b' }, [field('amount', 'Montant TTC (€)', h('input', { type: 'number', step: '0.01', min: '0', inputmode: 'decimal' })), field('due', 'Échéance', h('input', { type: 'date' })), field('pages', 'Pages', h('input', { type: 'number', min: '1', step: '1' }))]),
       h('div', { class: 'row' }, [field('reference', 'Référence du document', h('input', { type: 'text', maxlength: '80' }), 'N° de facture, de contrat…'), field('iban', 'IBAN', h('input', { type: 'text', maxlength: '40', autocomplete: 'off' }))]),
       h('div', { class: 'row' }, [field('status', 'Statut', status), field('file', 'PDF numérisé', h('input', { type: 'file', accept: 'application/pdf' }), '20 Mo maximum. Facultatif pour un pli détruit fermé.')]),
-      field('notes', 'Note interne', h('input', { type: 'text', maxlength: '300' })),
+      field('folder', 'Dossier (facultatif)', h('input', { type: 'text', maxlength: '80' }), 'Laissez vide : le classement automatique (Pro et Entreprise) s’applique.'),
+      field('ocr', 'Texte du document (OCR)', h('textarea', { rows: '3', maxlength: '20000' }), 'Facultatif. Rend le contenu du pli trouvable par la recherche plein texte du client.'),
+      field('notes', 'Note (visible par le client)', h('input', { type: 'text', maxlength: '300' })),
       h('p', { class: 'hint', text: 'À l’enregistrement, le client est prévenu par email (PDF joint si sa consigne est « email ») et son webhook est appelé s’il est en formule Entreprise.' }),
       h('div', {}, [btn]), msg
     ]);
@@ -395,9 +537,10 @@
         if (!r.ok) throw new Error('upload');
         var row = {
           id: id, customer_id: custSel.value, received_at: f.received.value || today, sender: f.sender.value.trim() || null,
-          doc_type: types.value, treatment: treat.value, status: status.value, pdf_path: path,
+          doc_type: types.value, treatment: treat.value || null, status: status.value, pdf_path: path,
           amount_ttc: f.amount.value === '' ? null : Number(f.amount.value), due_date: f.due.value || null,
           pages: f.pages.value === '' ? null : parseInt(f.pages.value, 10), notes: f.notes.value.trim() || null,
+          folder: f.folder.value.trim() || null, ocr_text: f.ocr.value.trim() || null,
           reference: f.reference.value.trim() || null, iban: f.iban.value.replace(/\s+/g, '').toUpperCase() || null,
           scanned_at: file ? new Date().toISOString() : null
         };
@@ -408,7 +551,7 @@
         return notify({ item_id: id }).then(function (res) {
           btn.disabled = false;
           msg.textContent = 'Pli déposé' + (notifyText(res) ? ' · ' + notifyText(res) : '') + '.';
-          f.reference.value = ''; f.iban.value = '';
+          f.reference.value = ''; f.iban.value = ''; f.folder.value = ''; f.ocr.value = '';
           f.sender.value = ''; f.amount.value = ''; f.due.value = ''; f.pages.value = ''; f.notes.value = ''; f.file.value = '';
           onDone();
         });

@@ -3,7 +3,7 @@ export const PLANS = [
   { id: 'essentiel', name: 'Essentiel', for: 'Particuliers et indépendants', month: 9, year: 90, quota: 30, extra: '0,50 €',
     feat: ['Numérisation sous 24 h ouvrées', 'Envoi du PDF par email', 'Espace client, archives 12 mois', 'Destruction certifiée après scan', '1 utilisateur'] },
   { id: 'pro', name: 'Pro', for: 'TPE, cabinets et associations', month: 29, year: 290, quota: 150, extra: '0,35 €', reco: true,
-    feat: ['Tout Essentiel, plus :', 'Classement automatique et recherche plein texte', 'Règles par expéditeur', 'Réexpédition des originaux sur demande', 'Archives 5 ans, 5 utilisateurs'] },
+    feat: ['Tout Essentiel, plus :', 'Classement automatique par dossier, recherche plein texte', 'Règles par expéditeur', 'Réexpédition des originaux sur demande', 'Archives 5 ans, 5 utilisateurs'] },
   { id: 'entreprise', name: 'Entreprise', for: 'PME et équipes qui utilisent des agents IA', month: 89, year: 890, quota: 600, extra: '0,25 €',
     feat: ['Tout Pro, plus :', 'API et webhooks à chaque pli', 'Extraction structurée : montant, échéance, IBAN…', 'Accès par API pour vos agents IA', 'Archives 10 ans, utilisateurs illimités'] },
 ];
@@ -133,7 +133,7 @@ ${li(['le PDF du pli, avec texte reconnu', 'le type de document, l’expéditeur
 <span class="k">}</span></pre>
 </div>
 <h2>Un humain reste dans la boucle</h2>
-<p>Une extraction automatique peut se tromper. Chaque champ extrait renvoie vers le PDF d'origine, et vous pouvez exiger une validation humaine avant qu'un agent agisse (paiement, résiliation, réponse à une administration).</p>
+<p>Les données sont relevées par notre équipe puis contrôlées, mais une erreur reste possible. Chaque champ renvoie vers le PDF d'origine, et vous pouvez exiger une validation humaine avant qu'un agent agisse (paiement, résiliation, réponse à une administration).</p>
 <h2>Cas d'usage</h2>
 ${li(['<strong>Agent comptable :</strong> rapproche chaque facture papier du bon de commande et prépare le paiement.', '<strong>Agent juridique :</strong> suit les délais des courriers d’huissiers, d’avocats et d’administrations.', '<strong>Agent assistant :</strong> prévient le dirigeant, rédige la réponse et la met en brouillon.'])}
 <p class="muted">Disponible avec la formule Entreprise. Voir aussi notre guide : <a href="/guides/automatiser-traitement-facture-papier-agent-ia/">automatiser le traitement d'une facture papier avec un agent IA</a>.</p>`,

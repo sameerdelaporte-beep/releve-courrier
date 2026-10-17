@@ -1,5 +1,6 @@
 // API Relève (formule Entreprise). Authentification : Authorization: Bearer rlv_live_...
 //   GET /functions/v1/api/v1/items?limit=50&status=numerise&before=2026-10-01T00:00:00Z
+//   GET /functions/v1/api/v1/items?q=facture+edf&folder=Énergie   (recherche plein texte, dossier)
 //   GET /functions/v1/api/v1/items/{id}
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -12,7 +13,7 @@ async function sha256(s: string) {
   const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
-const COLS = "id,received_at,scanned_at,sender,doc_type,amount_ttc,due_date,reference,iban,pages,treatment,status,certificate_ref,destroyed_at,expires_at,created_at,pdf_path";
+const COLS = "id,received_at,folder,applied_rule,scanned_at,sender,doc_type,amount_ttc,due_date,reference,iban,pages,treatment,status,certificate_ref,destroyed_at,expires_at,created_at,pdf_path";
 
 // deno-lint-ignore no-explicit-any
 async function present(it: any) {
@@ -48,6 +49,10 @@ Deno.serve(async (req) => {
   let q = admin.from("mail_items").select(COLS).eq("customer_id", k.customer_id).order("created_at", { ascending: false }).limit(limit + 1);
   const status = url.searchParams.get("status");
   if (status) q = q.eq("status", status);
+  const folder = url.searchParams.get("folder");
+  if (folder) q = q.eq("folder", folder);
+  const search = (url.searchParams.get("q") ?? "").replace(/[(),]/g, " ").trim().slice(0, 100);
+  if (search) q = q.textSearch("search", search, { type: "websearch", config: "french" });
   const before = url.searchParams.get("before");
   if (before && !isNaN(Date.parse(before))) q = q.lt("created_at", before);
   const { data, error } = await q;
