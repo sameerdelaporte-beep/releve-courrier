@@ -452,7 +452,7 @@
     }
     var rows = items.map(function (it) {
       var dl = it.pdf_path ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function (e) { openPdf(it.pdf_path, e.currentTarget); } }, ['Télécharger']) : h('span', { class: 'muted', text: '—' });
-      var cert = it.certificate_ref ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Télécharger le certificat de destruction', onclick: function (e) { openCertificate(it.id, e.currentTarget); } }, [it.certificate_ref]) : h('span', { class: 'muted', text: '—' });
+      var cert = it.certificate_ref ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Télécharger l’attestation de destruction', onclick: function (e) { openCertificate(it.id, e.currentTarget); } }, [it.certificate_ref]) : h('span', { class: 'muted', text: '—' });
       return h('tr', {}, [
         h('td', { text: fmtDate(it.received_at) }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }), h('td', { text: it.folder || '—' }),
         h('td', { text: fmtEur(it.amount_ttc) }), h('td', { text: fmtDate(it.due_date) }),
@@ -461,7 +461,7 @@
       ]);
     });
     box.appendChild(h('div', { class: 'tablewrap' }, [h('table', {}, [
-      h('thead', {}, [h('tr', {}, ['Reçu le', 'Expéditeur', 'Type', 'Dossier', 'Montant TTC', 'Échéance', 'Statut', 'Certificat', 'PDF', 'Conservé jusqu’au'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
+      h('thead', {}, [h('tr', {}, ['Reçu le', 'Expéditeur', 'Type', 'Dossier', 'Montant TTC', 'Échéance', 'Statut', 'Attestation', 'PDF', 'Conservé jusqu’au'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
       h('tbody', {}, rows)
     ])]));
   }
@@ -579,7 +579,7 @@
         return h('tr', {}, [h('td', { text: fmtDate(it.received_at) }), h('td', { text: cust }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }), h('td', {}, [sel]), h('td', { class: 'mono', text: it.certificate_ref || '—' })]);
       });
       box.appendChild(h('div', { class: 'tablewrap' }, [h('table', {}, [
-        h('thead', {}, [h('tr', {}, ['Reçu le', 'Client', 'Expéditeur', 'Type', 'Statut', 'Certificat'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
+        h('thead', {}, [h('tr', {}, ['Reçu le', 'Client', 'Expéditeur', 'Type', 'Statut', 'Attestation'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
         h('tbody', {}, rows)
       ])]));
     });

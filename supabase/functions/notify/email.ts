@@ -67,9 +67,9 @@ export function welcomeMail(c: { reference: string; name?: string | null; compan
 <ol style="padding-left:20px;margin:0 0 16px">
 <li>Communiquez cette adresse à vos expéditeurs, ou faites une réexpédition La Poste vers elle.</li>
 <li>Nous ouvrons et numérisons chaque pli sous 24 heures ouvrées.</li>
-<li>Il est ensuite traité selon votre consigne (envoi par email, espace client, réexpédition ou destruction) et l'original papier est détruit, avec certificat.</li>
+<li>Il est ensuite traité selon votre consigne (envoi par email, espace client, réexpédition ou destruction) et l'original papier est détruit, avec attestation.</li>
 </ol>
-<p>Votre espace client vous permet de retrouver vos plis, vos certificats et de régler vos préférences. La connexion se fait par un lien envoyé à cette adresse email, sans mot de passe.</p>
+<p>Votre espace client vous permet de retrouver vos plis, vos attestations et de régler vos préférences. La connexion se fait par un lien envoyé à cette adresse email, sans mot de passe.</p>
 <p style="margin:22px 0"><a href="${SITE}/espace/" style="background:#1c1b19;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;display:inline-block">Accéder à mon espace</a></p>
 <p style="font-size:13px;color:#6b675f">Votre référence client : <strong>${esc(c.reference)}</strong>. Gardez-la : elle identifie votre courrier.</p>`);
   const text = `Bonjour${c.name ? " " + c.name : ""},\n\nVotre abonnement ${PLAN[c.plan] ?? c.plan} est actif.\n\nVotre adresse de réception :\n${label}\n\nCommuniquez-la à vos expéditeurs. Nous numérisons chaque pli sous 24 h ouvrées, puis le traitons selon votre consigne.\n\nVotre espace client : ${SITE}/espace/ (connexion par lien envoyé par email).\n\nRelève · contact@releve-courrier.com`;
@@ -88,7 +88,7 @@ export function itemMail(it: { sender?: string | null; received_at?: string | nu
   const from = it.sender ? ` de ${it.sender}` : "";
   const date = it.received_at ? ` reçu le ${String(it.received_at).slice(0, 10).split("-").reverse().join("/")}` : "";
   const extra = it.status === "detruit" && it.certificate_ref
-    ? `<p>Un certificat de destruction (<strong>${esc(it.certificate_ref)}</strong>) est disponible dans votre espace client.</p>` : "";
+    ? `<p>Une attestation de destruction (<strong>${esc(it.certificate_ref)}</strong>) est disponible dans votre espace client.</p>` : "";
   const att = it.pdfAttached ? "<p>Le PDF est joint à cet email. Il est aussi disponible dans votre espace client.</p>" : "<p>Retrouvez le détail et le PDF dans votre espace client.</p>";
   const html = shell(title, `<p>Le pli${esc(from)}${esc(date)} a été traité.</p>${att}${extra}<p style="margin:22px 0"><a href="${SITE}/espace/" style="background:#1c1b19;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;display:inline-block">Ouvrir mon espace</a></p>`);
   const text = `${title}.\nLe pli${from}${date} a été traité.\n${it.pdfAttached ? "Le PDF est joint.\n" : ""}Espace client : ${SITE}/espace/`;

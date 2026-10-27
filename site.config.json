@@ -28,13 +28,16 @@
   ],
   "contactEmail": "contact@releve-courrier.com",
   "legal": {
-    "editor": "",
-    "status": "",
-    "siren": "",
+    "editor": "Sameer Delaporte, exerçant sous le nom commercial « Delaporte et Cie »",
+    "status": "Entrepreneur individuel (profession libérale non réglementée)",
+    "siren": "131 679 441",
     "vat": "",
     "capital": "",
-    "director": "",
+    "director": "Sameer Delaporte",
     "mediator": "",
-    "phone": ""
+    "phone": "",
+    "siret": "131 679 441 00017",
+    "ape": "6201Z",
+    "startDate": "1er octobre 2026"
   }
 }

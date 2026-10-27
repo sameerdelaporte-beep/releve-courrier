@@ -38,7 +38,7 @@ const LABEL = {
   '/numerisation-courrier-entreprise/': 'Numérisation de courrier',
   '/scan-courrier-par-email/': 'Scan par email',
   '/dematerialisation-courrier-agents-ia/': 'Courrier pour agents IA',
-  '/destruction-courrier-confidentiel/': 'Destruction certifiée',
+  '/destruction-courrier-confidentiel/': 'Destruction attestée',
   '/reexpedition-courrier-numerique/': 'Faire suivre son courrier',
   '/pour/tpe-independants/': 'TPE et indépendants',
   '/pour/cabinets-comptables-juridiques/': 'Cabinets comptables et juridiques',
@@ -147,7 +147,7 @@ ${scripts.map((x) => `<script src="${x}" defer></script>`).join('\n')}
 
 const orgLd = {
   '@type': 'Organization', '@id': ORG_ID, name: BRAND, url: SITE + '/', logo: `${SITE}/favicon.svg`,
-  description: "Relève reçoit le courrier papier des entreprises et des particuliers, le numérise sous 24 h ouvrées, puis le détruit de façon certifiée ou le réexpédie.",
+  description: "Relève reçoit le courrier papier des entreprises et des particuliers, le numérise sous 24 h ouvrées, puis le détruit, avec une attestation de destruction, ou le réexpédie.",
   areaServed: { '@type': 'Country', name: 'France' }, knowsLanguage: 'fr', email: cfg.contactEmail,
   address: { '@type': 'PostalAddress', streetAddress: '2 bis rue Hardy', postalCode: '78000', addressLocality: 'Versailles', addressCountry: 'FR' },
   contactPoint: { '@type': 'ContactPoint', contactType: 'customer service', email: cfg.contactEmail, availableLanguage: 'fr' },
@@ -209,7 +209,7 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
     ['/numerisation-courrier-entreprise/', 'Numérisation', 'Scan complet et lisible', 'Recto-verso en 300 dpi, PDF avec texte reconnu, enveloppe photographiée. Vous retrouvez tout par recherche.'],
     ['/scan-courrier-par-email/', 'Envoi personnalisé', 'Email, espace client ou API', 'PDF envoyé aux adresses de votre choix, selon l’expéditeur, avec copie dans votre espace.'],
     ['/reexpedition-courrier-numerique/', 'Mise en route', 'Faire suivre son courrier', 'Réexpédition La Poste, changement d’adresse et procuration pour les recommandés.'],
-    ['/destruction-courrier-confidentiel/', 'Destruction', 'Broyage certifié', 'Après numérisation, ou sans ouverture pour la publicité. Certificat horodaté pour chaque lot.'],
+    ['/destruction-courrier-confidentiel/', 'Destruction', 'Destruction attestée', 'Après numérisation, ou sans ouverture pour la publicité. Attestation de destruction horodatée pour chaque pli.'],
   ];
   const who = [
     ['/pour/tpe-independants/', 'TPE et indépendants', 'Les factures partent chez votre comptable, les échéances vous sont signalées.'],
@@ -220,9 +220,9 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
 <div class="hero-copy">
 <p class="eyebrow">Courrier papier → données numériques</p>
 <h1>Numérisation de courrier : vos plis papier en PDF sous 24 h</h1>
-<p class="lead">Faites suivre votre courrier à Relève. Chaque pli est ouvert, numérisé sous 24 h ouvrées, envoyé là où vous le voulez (email, espace client ou agents IA), puis détruit de façon certifiée.</p>
+<p class="lead">Faites suivre votre courrier à Relève. Chaque pli est ouvert, numérisé sous 24 h ouvrées, envoyé là où vous le voulez (email, espace client ou agents IA), puis détruit, avec une attestation de destruction.</p>
 <div class="hero-actions"><a class="btn btn-primary" href="/tarifs/">Choisir une formule</a><a class="btn btn-ghost" href="#parcours">Voir le parcours d’un pli</a></div>
-<ul class="hero-facts"><li>Numérisé sous 24 h ouvrées</li><li>Original détruit, certificat fourni</li><li>Sans engagement en mensuel</li></ul>
+<ul class="hero-facts"><li>Numérisé sous 24 h ouvrées</li><li>Original détruit, attestation fournie</li><li>Sans engagement en mensuel</li></ul>
 </div>
 <div class="desk" aria-hidden="true">
 <div class="envelope"><div class="stamp">0,96</div><div class="postmark">REÇU<br>08·10·26<br>09:42</div><div class="addr">SARL Atelier Morel<br><b>c/o Relève · Réf. RLV-48213</b><br>Adresse de réception</div><div class="scanline"></div></div>
@@ -243,7 +243,7 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
 </div></section>
 
 <section><div class="wrap">
-<div class="sec-head"><p class="eyebrow">Nos services</p><h2>Une consigne par défaut, des règles par expéditeur</h2><p class="lead">Fixez une consigne générale à l’inscription, puis affinez : les factures vers la comptabilité, l’administratif dans votre espace, les publicités à la broyeuse.</p></div>
+<div class="sec-head"><p class="eyebrow">Nos services</p><h2>Une consigne par défaut, des règles par expéditeur</h2><p class="lead">Fixez une consigne générale à l’inscription, puis affinez : les factures vers la comptabilité, l’administratif dans votre espace, les publicités à la destruction.</p></div>
 <div class="grid g4">${svc.map(([h, e, t, d]) => `<article class="item"><p class="eyebrow">${e}</p><h3><a href="${h}">${t}</a></h3><p>${d}</p><a class="more" href="${h}">En savoir plus</a></article>`).join('')}</div>
 <div class="callout" role="note"><span aria-hidden="true">⚠</span><p><strong>Jamais détruits :</strong> chèques, cartes bancaires, pièces d’identité, cartes Vitale et actes originaux. Ils sont numérisés, signalés dans votre espace et réexpédiés en lettre suivie.</p></div>
 </div></section>
@@ -279,7 +279,7 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
 <section id="securite"><div class="wrap">
 <div class="sec-head"><p class="eyebrow">Confidentialité</p><h2>Votre courrier ne traîne nulle part</h2><p class="lead">Le papier reste le moins longtemps possible entre nos mains, et chaque manipulation laisse une trace que vous pouvez consulter.</p></div>
 <div class="grid g3">
-${[['24 h ouvrées', 'Numérisé dès réception', 'Boîte aux lettres relevée chaque jour ouvré. Votre pli est numérisé au plus tard le jour ouvré suivant.'], ['P-4 · DIN 66399', 'Destruction certifiée', 'Broyage en particules sur place, juste après numérisation. Un certificat horodaté rejoint votre espace.'], ['Opérateur habilité', 'Une seule personne ouvre', 'Opérateur lié par un engagement de confidentialité, local fermé, aucun appareil personnel au poste de numérisation.'], ['Journal d’accès', 'Chaque action est tracée', 'Réception, ouverture, envoi, consultation, destruction : tout est horodaté et visible dans votre espace.'], ['Chiffrement', 'Stockage chiffré', 'Fichiers chiffrés au repos et en transit, hébergés dans l’Union européenne. Vous fixez la durée de conservation.'], ['RGPD', 'Contrat de sous-traitance', 'Un accord de traitement des données est signé avec chaque client professionnel. Export ou suppression sur demande.']].map(([e, t, d]) => `<article class="item"><p class="eyebrow">${e}</p><h3>${t}</h3><p>${d}</p></article>`).join('')}
+${[['24 h ouvrées', 'Numérisé dès réception', 'Boîte aux lettres relevée chaque jour ouvré. Votre pli est numérisé au plus tard le jour ouvré suivant.'], ['Attestation', 'Destruction attestée', 'L’original est détruit juste après numérisation. Une attestation de destruction horodatée, établie par Relève, rejoint votre espace. Elle n’est pas délivrée par un organisme tiers et ne vise aucun niveau de sécurité normalisé.'], ['Un seul opérateur', 'Une seule personne ouvre', 'Le courrier est ouvert et numérisé par l’exploitant de Relève, tenu au secret de la correspondance et à la confidentialité.'], ['Suivi', 'Les étapes sont datées', 'Réception, numérisation, envoi et destruction : les dates sont visibles dans votre espace.'], ['Chiffrement', 'Stockage chiffré', 'Fichiers chiffrés au repos et en transit, hébergés dans l’Union européenne. La durée de conservation dépend de votre formule.'], ['RGPD', 'Contrat de sous-traitance', 'Un accord de traitement des données est signé avec chaque client professionnel. Export ou suppression sur demande.']].map(([e, t, d]) => `<article class="item"><p class="eyebrow">${e}</p><h3>${t}</h3><p>${d}</p></article>`).join('')}
 </div></div></section>
 
 <section id="faq" class="band"><div class="wrap">
@@ -290,9 +290,9 @@ ${faqHtml(faqKeys)}
 ${ctaBand()}`;
   const ld = [orgLd, siteLd,
     { '@type': 'WebPage', '@id': SITE + '/#webpage', url: SITE + '/', name: 'Numérisation de courrier d’entreprise sous 24 h', isPartOf: { '@id': `${SITE}/#website` }, about: { '@id': ORG_ID }, inLanguage: 'fr-FR', dateModified: DATE },
-    { '@type': 'Service', name: 'Numérisation de courrier professionnel', serviceType: 'Numérisation et traitement de courrier', provider: { '@id': ORG_ID }, areaServed: { '@type': 'Country', name: 'France' }, description: 'Réception, ouverture, numérisation sous 24 h ouvrées, envoi personnalisé et destruction certifiée du courrier papier.' },
+    { '@type': 'Service', name: 'Numérisation de courrier professionnel', serviceType: 'Numérisation et traitement de courrier', provider: { '@id': ORG_ID }, areaServed: { '@type': 'Country', name: 'France' }, description: 'Réception, ouverture, numérisation sous 24 h ouvrées, envoi personnalisé et destruction du courrier papier avec attestation.' },
     faqLd(faqKeys)];
-  emit('/', layout({ scripts: [JS_FILE], p: '/', title: 'Numérisation de courrier d’entreprise sous 24 h | Relève', desc: 'Faites suivre votre courrier à Relève : ouverture, scan en PDF sous 24 h ouvrées, envoi par email ou à vos agents IA, destruction certifiée. Dès 9 € HT/mois.', body, ld }));
+  emit('/', layout({ scripts: [JS_FILE], p: '/', title: 'Numérisation de courrier d’entreprise sous 24 h | Relève', desc: 'Faites suivre votre courrier à Relève : ouverture, scan en PDF sous 24 h ouvrées, envoi par email ou à vos agents IA, destruction attestée. Dès 9 € HT/mois.', body, ld }));
 }
 
 /* ---------- Tarifs ---------- */
@@ -313,7 +313,7 @@ ${`<div class="tablewrap"><table><thead><tr><th scope="col">Fonction</th>${PLANS
 <tr><td>Pli supplémentaire HT</td>${PLANS.map((x) => `<td>${x.extra}</td>`).join('')}</tr>
 <tr><td>Numérisation sous 24 h ouvrées</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
 <tr><td>Envoi par email et espace client</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
-<tr><td>Destruction certifiée</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
+<tr><td>Destruction avec attestation</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
 <tr><td>Règles par expéditeur, classement automatique</td><td>Non</td><td>Oui</td><td>Oui</td></tr>
 <tr><td>Réexpédition des originaux</td><td>Non</td><td>Oui</td><td>Oui</td></tr>
 <tr><td>API, webhooks, extraction de données</td><td>Non</td><td>Non</td><td>Oui</td></tr>
@@ -385,9 +385,9 @@ legal('/mentions-legales/', 'Mentions légales', 'Mentions légales', `
 <h2>Éditeur du site</h2>
 <p>Le site <strong>releve-courrier.com</strong> est édité par :<br>
 Dénomination ou nom : ${LG('editor')}<br>
-Statut : ${LG('status')} (entrepreneur individuel, société, etc.)<br>
-SIREN : ${LG('siren')}<br>
-Capital social (le cas échéant) : ${LG('capital')}<br>
+Statut : ${LG('status')}<br>
+SIREN : ${LG('siren')} · SIRET : ${LG('siret')} · Code APE : ${LG('ape')}<br>
+Activité commencée le ${LG('startDate')}<br>${cfg.legal && cfg.legal.capital ? `Capital social : ${esc(cfg.legal.capital)}<br>` : ''}
 N° de TVA intracommunautaire : ${LG('vat')}<br>
 Adresse : Relève Courrier, ${ADDR}<br>
 Email : <a href="mailto:${MAIL}">${MAIL}</a><br>
@@ -420,7 +420,7 @@ legal('/cgv/', 'Conditions générales de vente', 'Conditions générales de ven
 <p>Relève reçoit à son adresse le courrier postal destiné au Client (adressé « c/o Relève » avec la référence client), l’ouvre, le numérise en PDF, puis le traite selon la consigne du Client : mise à disposition dans l’espace client, envoi par email, envoi par API et webhook (formule Entreprise), réexpédition de l’original ou destruction.</p>
 <ul>
 <li><strong>Délai de numérisation</strong> : au plus tard 24 heures ouvrées après la réception du pli par Relève. Il s’agit d’un objectif de service, hors jours fériés et fermetures exceptionnelles.</li>
-<li><strong>Destruction</strong> : l’original papier est détruit par broyage après numérisation, sauf si le Client a demandé sa réexpédition ou sa conservation. Un certificat de destruction numéroté est mis à disposition dans l’espace client.</li>
+<li><strong>Destruction</strong> : l’original papier est détruit après numérisation, sauf si le Client a demandé sa réexpédition ou sa conservation. Une attestation de destruction numérotée, établie par Relève (et non par un organisme tiers), est mise à disposition dans l’espace client. Elle ne vise aucun niveau de sécurité normalisé.</li>
 <li><strong>Conservation des copies numériques</strong> : 12 mois (Essentiel), 5 ans (Pro) ou 10 ans (Entreprise) à compter de la réception du pli. Passé ce délai, les copies sont supprimées automatiquement.</li>
 <li><strong>Quota</strong> : chaque formule inclut un nombre de plis par mois (30, 150 ou 600). Les plis supplémentaires sont facturés au tarif indiqué sur la page <a href="/tarifs/">Tarifs</a>.</li>
 </ul>
@@ -428,7 +428,7 @@ legal('/cgv/', 'Conditions générales de vente', 'Conditions générales de ven
 
 <h2>3. Mandat donné à Relève</h2>
 <p>En souscrivant, le Client donne à Relève mandat exprès de réceptionner, d’ouvrir, de lire pour les besoins de la numérisation et du classement, de numériser, de transmettre, de détruire ou de réexpédier le courrier qui lui est adressé, conformément à ses consignes. Le Client garantit être habilité à donner ce mandat, y compris, pour une société, au nom de celle-ci, et pour tout courrier adressé à des tiers dont il serait mandataire.</p>
-<p>Relève traite le courrier de façon confidentielle, dans le respect du secret des correspondances. L’accès aux contenus est limité aux personnes habilitées, et aucun contenu n’est utilisé à d’autres fins que l’exécution du service.</p>
+<p>Relève traite le courrier de façon confidentielle, dans le respect du secret des correspondances. L’accès aux contenus est limité aux personnes autorisées, et aucun contenu n’est utilisé à d’autres fins que l’exécution du service.</p>
 
 <h2>4. Courrier exclu</h2>
 <p>Ne sont pas pris en charge : les colis et envois volumineux, les produits dangereux, illicites ou périssables, ainsi que le courrier adressé à une personne non couverte par l’abonnement. Les chèques, moyens de paiement, pièces d’identité, titres, actes et documents originaux à valeur juridique ne sont jamais détruits : ils sont conservés ou réexpédiés au Client selon la procédure convenue. Relève peut refuser ou retourner à l’expéditeur tout courrier non conforme.</p>
@@ -483,7 +483,7 @@ legal('/confidentialite/', 'Politique de confidentialité', 'Politique de confid
 <tr><td>Messages envoyés à l’adresse de contact</td><td>Répondre à vos demandes</td><td>Intérêt légitime</td></tr>
 </tbody></table></div>
 <h2>3. Destinataires et sous-traitants</h2>
-<p>Vos données sont accessibles aux seules personnes habilitées de Relève et à ces prestataires, choisis pour leurs garanties :</p>
+<p>Vos données sont accessibles aux seules personnes autorisées de Relève et à ces prestataires, choisis pour leurs garanties :</p>
 <ul>
 <li><strong>Supabase</strong> : base de données, authentification et stockage des PDF, hébergés dans l’Union européenne (Francfort).</li>
 <li><strong>Stripe</strong> : paiement et facturation des abonnements.</li>
@@ -516,7 +516,7 @@ function appShell(mode, title, intro) {
   return `<section class="page-hero"><div class="wrap"><p class="eyebrow">${mode === 'admin' ? 'Opérateur' : 'Espace client'}</p><h1>${title}</h1><p class="lead">${intro}</p></div></section>
 <section class="tight"><div class="wrap"><div id="app" data-mode="${mode}" data-sb-url="${SB_URL}" data-sb-key="${cfg.supabase.publishableKey}" data-portal-url="${cfg.portalUrl || ''}" data-address="${esc((cfg.receptionAddress || []).join('|'))}"><noscript><p class="note">JavaScript est nécessaire pour accéder à votre espace.</p></noscript></div></div></section>`;
 }
-emit('/espace/', layout({ p: '/espace/', title: 'Espace client | Relève', desc: 'Accédez à vos plis numérisés, à vos certificats de destruction et à votre abonnement.', body: appShell('client', 'Mon espace client', 'Retrouvez vos plis numérisés, vos certificats de destruction et votre abonnement.'), ld: [orgLd], index: false, scripts: [ESPACE_FILE] }), { index: false });
+emit('/espace/', layout({ p: '/espace/', title: 'Espace client | Relève', desc: 'Accédez à vos plis numérisés, à vos attestations de destruction et à votre abonnement.', body: appShell('client', 'Mon espace client', 'Retrouvez vos plis numérisés, vos attestations de destruction et votre abonnement.'), ld: [orgLd], index: false, scripts: [ESPACE_FILE] }), { index: false });
 emit('/espace/admin/', layout({ p: '/espace/admin/', title: 'Espace opérateur | Relève', desc: 'Dépôt des plis numérisés.', body: appShell('admin', 'Espace opérateur', 'Déposez les plis numérisés dans l’espace de chaque client.'), ld: [orgLd], index: false, scripts: [ESPACE_FILE], cur: '/espace/' }), { index: false });
 
 /* 404 */
@@ -530,7 +530,7 @@ write('favicon.svg', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64
 write('site.webmanifest', JSON.stringify({ name: BRAND, short_name: BRAND, lang: 'fr', start_url: '/', display: 'browser', background_color: '#F1F2EC', theme_color: '#4A31C2', icons: [{ src: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }] }));
 write('llms.txt', `# ${BRAND}
 
-> ${BRAND} reçoit le courrier papier des entreprises et des particuliers (réexpédié à son adresse), l'ouvre, le numérise en PDF avec texte reconnu sous 24 heures ouvrées, puis le détruit de façon certifiée ou le réexpédie. Les documents sont livrés par email, dans un espace client ou, avec la formule Entreprise, par API et webhook à des outils et agents IA. Service pour la France.
+> ${BRAND} reçoit le courrier papier des entreprises et des particuliers (réexpédié à son adresse), l'ouvre, le numérise en PDF avec texte reconnu sous 24 heures ouvrées, puis le détruit, avec une attestation de destruction, ou le réexpédie. Les documents sont livrés par email, dans un espace client ou, avec la formule Entreprise, par API et webhook à des outils et agents IA. Service pour la France.
 
 ## Services
 ${['/numerisation-courrier-entreprise/', '/scan-courrier-par-email/', '/dematerialisation-courrier-agents-ia/', '/destruction-courrier-confidentiel/', '/reexpedition-courrier-numerique/'].map((x) => `- [${LABEL[x]}](${SITE}${x})`).join('\n')}

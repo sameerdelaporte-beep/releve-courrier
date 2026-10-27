@@ -1,7 +1,7 @@
 // Contenu éditorial de Relève. Une entrée = une page indexable.
 export const PLANS = [
   { id: 'essentiel', name: 'Essentiel', for: 'Particuliers et indépendants', month: 9, year: 90, quota: 30, extra: '0,50 €',
-    feat: ['Numérisation sous 24 h ouvrées', 'Envoi du PDF par email', 'Espace client, archives 12 mois', 'Destruction certifiée après scan', '1 utilisateur'] },
+    feat: ['Numérisation sous 24 h ouvrées', 'Envoi du PDF par email', 'Espace client, archives 12 mois', 'Destruction attestée après scan', '1 utilisateur'] },
   { id: 'pro', name: 'Pro', for: 'TPE, cabinets et associations', month: 29, year: 290, quota: 150, extra: '0,35 €', reco: true,
     feat: ['Tout Essentiel, plus :', 'Classement automatique par dossier, recherche plein texte', 'Règles par expéditeur', 'Réexpédition des originaux sur demande', 'Archives 5 ans, 5 utilisateurs'] },
   { id: 'entreprise', name: 'Entreprise', for: 'PME et équipes qui utilisent des agents IA', month: 89, year: 890, quota: 600, extra: '0,25 €',
@@ -11,22 +11,22 @@ export const PLANS = [
 export const MODES = {
   email: { sub: 'Consigne : recevoir par email', steps: [
     { t: 'Réception', time: '08/10 · 09:42', d: "Relève de la boîte aux lettres. L'enveloppe est photographiée fermée, vous êtes notifié." },
-    { t: 'Ouverture et numérisation', time: '08/10 · 11:15', d: 'Ouvert par un opérateur habilité, scanné recto-verso en 300 dpi, texte reconnu.', tag: 'Sous 24 h ouvrées' },
+    { t: 'Ouverture et numérisation', time: '08/10 · 11:15', d: 'Ouvert par l’exploitant, scanné recto-verso en 300 dpi, texte reconnu.', tag: 'Sous 24 h ouvrées' },
     { t: 'Vos règles', time: '08/10 · 11:15', d: 'Règle « Factures fournisseurs » appliquée automatiquement.' },
     { t: 'Envoi par email', time: '08/10 · 11:16', d: 'PDF de 3 pages envoyé à compta@atelier-morel.fr, copie dans votre espace.' },
-    { t: 'Destruction certifiée', time: '08/10 · 17:30', d: 'Broyage niveau P-4. Certificat DST-2026-0412 ajouté à votre espace.', tag: 'Original détruit' }] },
+    { t: 'Destruction attestée', time: '08/10 · 17:30', d: 'Original détruit. Attestation DST-2026-0412 ajoutée à votre espace.', tag: 'Original détruit' }] },
   espace: { sub: 'Consigne : mise à disposition', steps: [
     { t: 'Réception', time: '08/10 · 09:42', d: "Relève de la boîte aux lettres. L'enveloppe est photographiée fermée, vous êtes notifié." },
-    { t: 'Ouverture et numérisation', time: '08/10 · 11:15', d: 'Ouvert par un opérateur habilité, scanné recto-verso en 300 dpi, texte reconnu.', tag: 'Sous 24 h ouvrées' },
+    { t: 'Ouverture et numérisation', time: '08/10 · 11:15', d: 'Ouvert par l’exploitant, scanné recto-verso en 300 dpi, texte reconnu.', tag: 'Sous 24 h ouvrées' },
     { t: 'Vos règles', time: '08/10 · 11:15', d: 'Classement automatique : Factures › Énergie › 2026.' },
     { t: "Dépôt dans l'espace", time: '08/10 · 11:16', d: 'Pli disponible dans votre espace client, consultable par vos collaborateurs.' },
-    { t: 'Destruction certifiée', time: '08/10 · 17:30', d: 'Broyage niveau P-4. Certificat DST-2026-0412 ajouté à votre espace.', tag: 'Original détruit' }] },
+    { t: 'Destruction attestée', time: '08/10 · 17:30', d: 'Original détruit. Attestation DST-2026-0412 ajoutée à votre espace.', tag: 'Original détruit' }] },
   api: { sub: 'Consigne : agents IA via API', steps: [
     { t: 'Réception', time: '08/10 · 09:42', d: "Relève de la boîte aux lettres. L'enveloppe est photographiée fermée, vous êtes notifié." },
     { t: 'Ouverture et numérisation', time: '08/10 · 11:15', d: 'Scan 300 dpi, puis extraction : expéditeur, montant, échéance, références.', tag: 'Sous 24 h ouvrées' },
     { t: 'Vos règles', time: '08/10 · 11:15', d: 'Règle « Tout le courrier → agent comptable » appliquée.' },
     { t: 'Transmis à vos agents', time: '08/10 · 11:16', d: 'Données structurées et PDF envoyés à votre webhook. Réponse reçue : 200 OK.' },
-    { t: 'Destruction certifiée', time: '08/10 · 17:30', d: 'Broyage niveau P-4. Certificat DST-2026-0412 ajouté à votre espace.', tag: 'Original détruit' }] },
+    { t: 'Destruction attestée', time: '08/10 · 17:30', d: 'Original détruit. Attestation DST-2026-0412 ajoutée à votre espace.', tag: 'Original détruit' }] },
   reexp: { sub: "Consigne : réexpédition de l'original", steps: [
     { t: 'Réception', time: '08/10 · 09:42', d: "Relève de la boîte aux lettres. L'enveloppe est photographiée fermée, vous êtes notifié." },
     { t: 'Ouverture et numérisation', time: '08/10 · 11:15', d: "Copie numérique réalisée avant l'envoi, pour que vous n'attendiez pas le facteur.", tag: 'Sous 24 h ouvrées' },
@@ -38,20 +38,20 @@ export const MODES = {
     { t: "Pas d'ouverture", time: '—', d: "Le pli n'est pas ouvert ni numérisé.", skip: true },
     { t: 'Vos règles', time: '08/10 · 09:43', d: 'Règle « Publicités et prospectus → destruction » appliquée.' },
     { t: 'Rien à livrer', time: '—', d: "Seule la photo de l'enveloppe apparaît dans votre espace.", skip: true },
-    { t: 'Destruction certifiée', time: '08/10 · 17:30', d: 'Broyé sans ouverture, niveau P-4. Certificat DST-2026-0412.', tag: 'Détruit fermé' }] },
+    { t: 'Destruction attestée', time: '08/10 · 17:30', d: 'Détruit sans ouverture. Attestation DST-2026-0412.', tag: 'Détruit fermé' }] },
 };
 export const MODE_LABELS = { email: 'Recevoir par email', espace: 'Déposer dans mon espace', api: 'Envoyer à mes agents IA', reexp: "Réexpédier l'original", detruire: 'Détruire sans ouvrir' };
 
 export const FAQ = {
   arrivee: ['Comment mon courrier arrive-t-il chez Relève ?', "Après la souscription, vous retrouvez votre adresse de réception et votre référence client dans votre espace client. Deux possibilités : souscrire un service de réexpédition auprès de La Poste vers cette adresse, ou communiquer directement l'adresse à vos expéditeurs. Ajoutez toujours la ligne « c/o Relève · Réf. RLV-… » sous votre nom pour que le pli soit rattaché à votre compte."],
-  original: ["Que devient l'original papier ?", "Il est broyé juste après la numérisation et un certificat de destruction est ajouté à votre espace. Si vous choisissez la réexpédition, l'original vous est renvoyé au lieu d'être détruit. Les documents de valeur (chèques, moyens de paiement, pièces d'identité, actes originaux) ne sont jamais détruits."],
+  original: ["Que devient l'original papier ?", "Il est détruit juste après la numérisation et une attestation de destruction est ajoutée à votre espace. Si vous choisissez la réexpédition, l'original vous est renvoyé au lieu d'être détruit. Les documents de valeur (chèques, moyens de paiement, pièces d'identité, actes originaux) ne sont jamais détruits."],
   delai: ['Quel est le délai de numérisation ?', "24 heures ouvrées à partir de la réception, du lundi au vendredi hors jours fériés. Un pli reçu le vendredi après la relève est numérisé le lundi."],
   recommandes: ['Les lettres recommandées sont-elles prises en charge ?', "Oui, avec la procuration La Poste que vous signez à l'inscription. Nous retirons vos recommandés, puis l'avis de réception et le contenu sont numérisés comme un pli ordinaire."],
   domiciliation: ['Relève est-il une domiciliation ?', "Non. Vous conservez votre adresse officielle (siège social ou domicile) ; seul votre courrier nous est réexpédié pour être traité. Relève ne peut pas servir d'adresse de siège social."],
   quota: ['Que se passe-t-il si je dépasse mon nombre de plis ?', "Les plis au-delà du quota sont facturés à l'unité, au tarif indiqué dans votre formule (de 0,25 € à 0,50 € HT). Vous pouvez changer de formule à tout moment depuis votre espace."],
   resiliation: ['Puis-je résilier quand je veux ?', "Oui. En formule mensuelle, la résiliation prend effet à la fin du mois en cours. Pensez à mettre fin en même temps à votre service de réexpédition La Poste."],
   valeur: ['Les scans ont-ils une valeur juridique ?', "Un scan est une copie : sa force probante dépend du document et de l'usage que vous en faites. Relève ne propose pas d'archivage à valeur probante certifiée. Pour les actes, titres et contrats dont vous devez conserver l'original, choisissez la réexpédition de l'original."],
-  rgpd: ['Mes données sont-elles protégées ?', "Les fichiers sont chiffrés au repos et en transit, hébergés dans l'Union européenne, et chaque action est tracée dans un journal visible depuis votre espace. Un accord de traitement des données (RGPD) est signé avec chaque client professionnel. Vous fixez la durée de conservation et pouvez tout exporter ou supprimer."],
+  rgpd: ['Mes données sont-elles protégées ?', "Les fichiers sont chiffrés au repos et en transit, hébergés dans l'Union européenne, et les dates de réception, de numérisation, d'envoi et de destruction sont visibles dans votre espace. Un accord de traitement des données (RGPD) est signé avec chaque client professionnel. La durée de conservation dépend de votre formule, et vous pouvez demander l'export ou la suppression de vos données."],
   ia: ['Puis-je connecter mes agents IA à mon courrier ?', "Oui, avec la formule Entreprise : un webhook vous notifie à chaque nouveau pli et une API donne accès au PDF et aux données extraites (expéditeur, type, montant, échéance, références). Vous gardez la main sur ce que chaque agent peut lire."],
   valeurs: ['Que faites-vous des chèques et des pièces d’identité ?', "Ils ne sont jamais détruits. Le pli est numérisé, signalé dans votre espace, puis réexpédié en lettre suivie à l'adresse que vous indiquez."],
   confidentiel: ['Mon courrier peut-il rester fermé ?', "Oui. Vous pouvez demander que les plis portant la mention « Personnel » ou « Confidentiel », ou venant d'expéditeurs que vous désignez, ne soient jamais ouverts. Ils sont alors réexpédiés fermés ou détruits fermés, selon votre choix."],
@@ -80,7 +80,7 @@ ${li(['factures fournisseurs, relevés et avis d’échéance', 'courriers admin
 <h2>Un scan fait pour être lu, classé et retrouvé</h2>
 ${li(['recto-verso en couleur, 300 dpi', 'un fichier PDF par pli, avec texte reconnu (OCR) pour la recherche plein texte', "photo de l'enveloppe fermée, pour garder l'expéditeur et le cachet de la poste", 'nom de fichier lisible : date, expéditeur, type de document'])}
 <h2>Le parcours d'un pli, de la boîte aux lettres au PDF</h2>
-${steps(['<strong>Réception.</strong> La boîte aux lettres est relevée chaque jour ouvré, l’enveloppe est photographiée.', '<strong>Ouverture et numérisation</strong> par un opérateur habilité, au plus tard 24 heures ouvrées après la réception.', '<strong>Application de vos règles</strong> : qui reçoit quoi, où classer, quoi ne jamais ouvrir.', '<strong>Livraison</strong> par email, dans votre espace client ou vers vos outils.', '<strong>Destruction certifiée</strong> de l’original, avec certificat horodaté, ou réexpédition si vous le demandez.'])}
+${steps(['<strong>Réception.</strong> La boîte aux lettres est relevée chaque jour ouvré, l’enveloppe est photographiée.', '<strong>Ouverture et numérisation</strong> par l’exploitant, au plus tard 24 heures ouvrées après la réception.', '<strong>Application de vos règles</strong> : qui reçoit quoi, où classer, quoi ne jamais ouvrir.', '<strong>Livraison</strong> par email, dans votre espace client ou vers vos outils.', '<strong>Destruction attestée</strong> de l’original, avec attestation horodatée, ou réexpédition si vous le demandez.'])}
 ${valuables}
 <h2>Pourquoi numériser son courrier professionnel</h2>
 ${li(["Vous n'avez plus besoin d'être sur place pour ouvrir le courrier.", 'Vos équipes retrouvent un document en quelques secondes, par expéditeur ou par mot-clé.', 'La comptabilité reçoit les factures le jour même, sans attendre une pochette.', 'Les échéances (impôts, assurances, loyers) ne dépendent plus de la présence d’une personne au bureau.'])}
@@ -91,7 +91,7 @@ ${li(["Vous n'avez plus besoin d'être sur place pour ouvrir le courrier.", 'Vos
     title: 'Scan de courrier par email : PDF sous 24 h | Relève',
     desc: "Recevez chaque courrier scanné par email, en PDF avec texte recherchable, à la ou aux adresses de votre choix. Règles par expéditeur, lien sécurisé en option.",
     h1: 'Recevoir son courrier scanné par email', eyebrow: 'Envoi personnalisé',
-    lead: "Chaque pli arrive dans la bonne boîte mail, au format PDF, sans que personne n'ait à l'ouvrir. Les factures vont à la comptabilité, l'administratif au dirigeant, les publicités à la broyeuse.",
+    lead: "Chaque pli arrive dans la bonne boîte mail, au format PDF, sans que personne n'ait à l'ouvrir. Les factures vont à la comptabilité, l'administratif au dirigeant, les publicités à la destruction.",
     faq: ['delai', 'rgpd', 'confidentiel', 'paiement'],
     related: ['/numerisation-courrier-entreprise/', '/pour/tpe-independants/', '/pour/cabinets-comptables-juridiques/', '/tarifs/'],
     body: `
@@ -101,7 +101,7 @@ ${table(['Si le courrier est…', 'Alors Relève…'], [['Une facture fournisseu
 <h2>PDF joint ou lien sécurisé</h2>
 <p>Par défaut le PDF est joint à l'email. Pour les documents sensibles, activez l'envoi d'un lien sécurisé : le fichier reste dans votre espace client et n'est pas copié dans les boîtes mail.</p>
 <h2>Plusieurs destinataires, une seule source de vérité</h2>
-${li(['plusieurs adresses par règle (comptable, associé, assistante)', 'copie systématique dans votre espace client, classée par expéditeur', 'notification immédiate ou résumé quotidien, au choix', 'journal des envois : qui a reçu quoi, et quand'])}
+${li(['une adresse email de réception des scans, distincte de celle du compte', 'copie systématique dans votre espace client', 'en formule Pro : règles par expéditeur et classement par dossier', 'date d’envoi visible dans votre espace'])}
 <h2>Mise en place en quelques minutes</h2>
 ${steps(['Choisissez une formule sur la page <a href="/tarifs/">tarifs</a>.', 'Indiquez l’adresse qui doit recevoir les scans lors du paiement.', 'Faites suivre votre courrier vers Relève : le guide est sur la page <a href="/reexpedition-courrier-numerique/">réexpédition</a>.', 'Recevez vos premiers PDF dès le lendemain ouvré de la réception.'])}`,
   },
@@ -140,19 +140,19 @@ ${li(['<strong>Agent comptable :</strong> rapproche chaque facture papier du bon
   },
   {
     path: '/destruction-courrier-confidentiel/', kind: 'service', service: 'Destruction de courrier confidentiel',
-    title: 'Destruction de courrier confidentiel certifiée | Relève',
-    desc: "Après numérisation, l'original est broyé (niveau P-4, DIN 66399) et vous recevez un certificat de destruction horodaté. Destruction sans ouverture possible.",
-    h1: 'Destruction de courrier confidentiel, avec certificat', eyebrow: 'Destruction certifiée',
-    lead: "Le papier ne traîne pas. Une fois le pli numérisé, l'original est broyé le jour même et vous recevez la preuve de sa destruction dans votre espace.",
+    title: 'Destruction de courrier confidentiel avec attestation | Relève',
+    desc: "Après numérisation, l'original est détruit et vous recevez une attestation de destruction horodatée. Destruction sans ouverture possible.",
+    h1: 'Destruction de courrier confidentiel, avec attestation', eyebrow: 'Destruction attestée',
+    lead: "Le papier ne traîne pas. Une fois le pli numérisé, l'original est détruit le jour même et vous recevez l'attestation de sa destruction dans votre espace.",
     faq: ['original', 'valeurs', 'confidentiel', 'rgpd'],
     related: ['/numerisation-courrier-entreprise/', '/reexpedition-courrier-numerique/', '/pour/cabinets-comptables-juridiques/', '/faq/'],
     body: `
 <h2>Trois façons de détruire</h2>
-${table(['Situation', 'Ouverture', 'Numérisation', 'Destruction'], [['Courrier normal', 'Oui', 'Oui', 'Après le scan, le jour même'], ['Publicité et prospectus', 'Non', 'Non', 'Broyé fermé'], ['Pli « Personnel » ou « Confidentiel »', 'Selon votre règle', 'Selon votre règle', 'Fermé : réexpédié ou broyé fermé'], ['Contrat ou acte à conserver en original', 'Oui', 'Oui', 'Aucune : l’original vous est renvoyé']])}
+${table(['Situation', 'Ouverture', 'Numérisation', 'Destruction'], [['Courrier normal', 'Oui', 'Oui', 'Après le scan, le jour même'], ['Publicité et prospectus', 'Non', 'Non', 'Détruit fermé'], ['Pli « Personnel » ou « Confidentiel »', 'Selon votre règle', 'Selon votre règle', 'Fermé : réexpédié ou détruit fermé'], ['Contrat ou acte à conserver en original', 'Oui', 'Oui', 'Aucune : l’original vous est renvoyé']])}
 <h2>Comment l'original est détruit</h2>
-${li(['broyage en particules de niveau P-4 (DIN 66399), sur place', 'destruction par lot, après contrôle de la qualité du scan', 'certificat de destruction horodaté (DST-AAAA-NNNN) ajouté à votre espace', 'journal d’accès : réception, ouverture, envoi, destruction'])}
+${li(['destruction du papier par Relève, sans niveau de sécurité normalisé (pas de certification DIN 66399)', 'destruction par lot, après contrôle de la qualité du scan', 'attestation de destruction horodatée (DST-AAAA-NNNN), établie par Relève et non par un organisme tiers, ajoutée à votre espace', 'dates de réception, numérisation, envoi et destruction visibles dans votre espace'])}
 <h2>Un original détruit n'est jamais « perdu »</h2>
-<p>Avant le broyage, un opérateur vérifie que le PDF est complet et lisible. Un lot n'est détruit qu'après ce contrôle. Vous pouvez aussi demander la conservation de certains plis pendant une durée fixée.</p>
+<p>Avant la destruction, un opérateur vérifie que le PDF est complet et lisible. Un lot n'est détruit qu'après ce contrôle. Vous pouvez aussi demander la conservation de certains plis pendant une durée fixée.</p>
 ${valuables}
 <h2>La destruction, un geste RGPD</h2>
 <p>Moins de papier conservé, c'est moins de données personnelles exposées. Vous fixez la durée de conservation des fichiers numériques dans votre espace, et vous pouvez les exporter ou les supprimer à tout moment.</p>`,
@@ -206,7 +206,7 @@ ${table(['Expéditeur', 'Action'], [['Fournisseurs', 'PDF au cabinet comptable, 
 <h2>Un flux de courrier par dossier client</h2>
 ${li(['une règle de traitement par client ou par expéditeur', 'classement automatique par dossier et par type de document', 'PDF avec texte recherchable pour retrouver une pièce par mot-clé', 'jusqu’à 5 utilisateurs en formule Pro, illimité en formule Entreprise'])}
 <h2>Confidentialité et traçabilité</h2>
-<p>Le courrier est ouvert par un opérateur lié par un engagement de confidentialité, dans un local fermé. Les plis marqués « Personnel » ou « Confidentiel », ou venant d'expéditeurs que vous désignez, restent fermés. Chaque action est tracée : réception, ouverture, envoi, consultation, destruction.</p>
+<p>Le courrier est ouvert par l'exploitant de Relève, tenu au secret de la correspondance. Les plis marqués « Personnel » ou « Confidentiel », ou venant d'expéditeurs que vous désignez, restent fermés. Les dates de réception, de numérisation, d'envoi et de destruction sont visibles dans votre espace.</p>
 <div class="callout info" role="note"><span aria-hidden="true">i</span><p><strong>Secret professionnel :</strong> si votre profession y est soumise, définissez avec nous les règles de traitement avant de rediriger le courrier. Un accord de traitement des données (RGPD) est signé avec chaque cabinet.</p></div>
 <h2>Pour les cabinets qui automatisent</h2>
 <p>Avec la formule Entreprise, un webhook et une API donnent à vos outils ou à vos agents IA accès aux plis et à leurs données extraites. Voir <a href="/dematerialisation-courrier-agents-ia/">courrier papier pour agents IA</a>.</p>`,

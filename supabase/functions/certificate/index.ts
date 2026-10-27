@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
 
   page.drawRectangle({ x: 0, y: 770, width: 595, height: 72, color: ink });
   text("Relève", 48, 797, 24, bold, rgb(1, 1, 1));
-  text("CERTIFICAT DE DESTRUCTION", 48, 722, 22, bold);
+  text("ATTESTATION DE DESTRUCTION", 48, 722, 22, bold);
   text(`N° ${it.certificate_ref}`, 48, 698, 14, bold, grey);
 
   const rows: [string, string][] = [
@@ -58,15 +58,16 @@ Deno.serve(async (req) => {
 
   const lines = [
     "Relève Courrier atteste que l'original papier du pli désigné ci-dessus a été",
-    "numérisé, puis détruit par broyage (niveau de sécurité P-4, norme DIN 66399)",
-    "à la date indiquée. Une copie numérique est conservée dans l'espace client",
-    "pendant la durée prévue par la formule d'abonnement du client.",
+    "numérisé, puis détruit. Cette attestation est établie par Relève ; elle n'est pas",
+    "délivrée par un organisme tiers et ne vise aucun niveau de sécurité normalisé.",
+    "Une copie numérique est conservée dans l'espace client pendant la durée",
+    "prévue par la formule d'abonnement du client.",
   ];
   y -= 14;
   for (const l of lines) { text(l, 48, y, 11); y -= 18; }
   y -= 24;
   text("Établi par Relève Courrier, 2 bis rue Hardy, 78000 Versailles.", 48, y, 10, font, grey);
-  text(`Empreinte du certificat : ${empreinte}`, 48, 60, 9, font, grey);
+  text(`Empreinte de l'attestation : ${empreinte}`, 48, 60, 9, font, grey);
   text("Contact : contact@releve-courrier.com", 48, 46, 9, font, grey);
 
   const bytes = await pdf.save();
