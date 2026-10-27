@@ -66,7 +66,8 @@ Deno.serve(async (req) => {
   y -= 14;
   for (const l of lines) { text(l, 48, y, 11); y -= 18; }
   y -= 24;
-  text("Établi par Relève Courrier, 2 bis rue Hardy, 78000 Versailles.", 48, y, 10, font, grey);
+  text("Établi par Sameer Delaporte (Delaporte et Cie), entrepreneur individuel, SIRET 131 679 441 00017.", 48, y, 10, font, grey);
+  text("Relève Courrier, 2 bis rue Hardy, 78000 Versailles.", 48, y - 14, 10, font, grey);
   text(`Empreinte de l'attestation : ${empreinte}`, 48, 60, 9, font, grey);
   text("Contact : contact@releve-courrier.com", 48, 46, 9, font, grey);
 
