@@ -191,10 +191,10 @@ const planCard = (pl, { features = true } = {}) => {
   return `<article class="plan${pl.reco ? ' reco' : ''}">
 ${pl.reco ? '<span class="plan-badge">LE PLUS CHOISI</span>' : ''}
 <div><h3>${pl.name}</h3><p class="plan-for">${pl.for}</p></div>
-<div><div class="price"><strong>${pl.month} €</strong><span>HT / mois</span></div><p class="price-alt">ou ${eur(pl.year)} HT / an, 2 mois offerts</p></div>
+<div><div class="price"><strong>${pl.month} €</strong><span>/ mois</span></div><p class="price-alt">ou ${eur(pl.year)} / an, 2 mois offerts</p></div>
 <div class="quota"><span>${pl.quota} plis / mois</span><span>puis ${pl.extra} / pli</span></div>
 ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</ul>` : ''}
-<div class="plan-cta"><a class="btn ${pl.reco ? 'btn-primary' : 'btn-ghost'}" href="${l.mensuel}" rel="nofollow noopener">Souscrire à ${pl.name} (mensuel)</a><a class="alt" href="${l.annuel}" rel="nofollow noopener">Ou en annuel : ${eur(pl.year)} HT</a></div>
+<div class="plan-cta"><a class="btn ${pl.reco ? 'btn-primary' : 'btn-ghost'}" href="${l.mensuel}" rel="nofollow noopener">Souscrire à ${pl.name} (mensuel)</a><a class="alt" href="${l.annuel}" rel="nofollow noopener">Ou en annuel : ${eur(pl.year)}</a></div>
 </article>`;
 };
 
@@ -273,7 +273,7 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
 <section id="tarifs" class="band"><div class="wrap">
 <div class="sec-head"><p class="eyebrow">Tarifs</p><h2>Une formule selon votre volume de courrier</h2><p class="lead">Un « pli » est une enveloppe reçue, quel que soit son nombre de pages. Sans engagement en mensuel, paiement sécurisé par Stripe.</p></div>
 <div class="plans">${PLANS.map((pl) => planCard(pl)).join('')}</div>
-<p class="note">Prix hors taxes, TVA 20 % en sus. Réexpédition des originaux : frais postaux refacturés au tarif La Poste. <a href="/tarifs/">Comparer les formules en détail</a>.</p>
+<p class="note">Prix nets : TVA non applicable, art. 293 B du CGI. Réexpédition des originaux : frais postaux refacturés au tarif La Poste. <a href="/tarifs/">Comparer les formules en détail</a>.</p>
 </div></section>
 
 <section id="securite"><div class="wrap">
@@ -304,13 +304,13 @@ ${ctaBand()}`;
 <section class="page-hero"><div class="wrap"><p class="eyebrow">Tarifs</p><h1>Tarifs de numérisation de courrier : dès 9&nbsp;€ HT par mois</h1>
 <p class="lead">Trois formules selon le nombre de plis reçus chaque mois. Sans engagement en mensuel, deux mois offerts en annuel. Le paiement se fait sur une page sécurisée Stripe.</p></div></section>
 <section class="tight"><div class="wrap"><div class="plans">${PLANS.map((pl) => planCard(pl)).join('')}</div>
-<p class="note">Prix hors taxes ; la TVA (20 %) est calculée et ajoutée au paiement. Réexpédition des originaux : frais postaux refacturés au tarif La Poste en vigueur. Un pli est une enveloppe reçue, quel que soit son nombre de pages.</p></div></section>
+<p class="note">Prix nets : TVA non applicable, art. 293 B du CGI. Réexpédition des originaux : frais postaux refacturés au tarif La Poste en vigueur. Un pli est une enveloppe reçue, quel que soit son nombre de pages.</p></div></section>
 <section class="tight"><div class="wrap"><h2>Comparer les formules</h2><div class="gap"></div>
 ${`<div class="tablewrap"><table><thead><tr><th scope="col">Fonction</th>${PLANS.map((x) => `<th scope="col">${x.name}</th>`).join('')}</tr></thead><tbody>
-<tr><td>Prix mensuel HT</td>${PLANS.map((x) => `<td>${x.month} €</td>`).join('')}</tr>
-<tr><td>Prix annuel HT</td>${PLANS.map((x) => `<td>${eur(x.year)}</td>`).join('')}</tr>
+<tr><td>Prix mensuel (TVA non applicable)</td>${PLANS.map((x) => `<td>${x.month} €</td>`).join('')}</tr>
+<tr><td>Prix annuel (TVA non applicable)</td>${PLANS.map((x) => `<td>${eur(x.year)}</td>`).join('')}</tr>
 <tr><td>Plis inclus par mois</td>${PLANS.map((x) => `<td>${x.quota}</td>`).join('')}</tr>
-<tr><td>Pli supplémentaire HT</td>${PLANS.map((x) => `<td>${x.extra}</td>`).join('')}</tr>
+<tr><td>Pli supplémentaire</td>${PLANS.map((x) => `<td>${x.extra}</td>`).join('')}</tr>
 <tr><td>Numérisation sous 24 h ouvrées</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
 <tr><td>Envoi par email et espace client</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
 <tr><td>Destruction avec attestation</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
@@ -325,11 +325,11 @@ ${relatedHtml(['/numerisation-courrier-entreprise/', '/reexpedition-courrier-num
   const prod = PLANS.map((pl) => ({
     '@type': 'Product', name: `Relève ${pl.name}`, description: `${pl.quota} plis numérisés par mois. ${pl.for}.`, brand: { '@type': 'Brand', name: BRAND }, url: SITE + p,
     offers: [
-      { '@type': 'Offer', name: `${pl.name} mensuel`, priceCurrency: 'EUR', price: String(pl.month), priceSpecification: { '@type': 'UnitPriceSpecification', price: pl.month, priceCurrency: 'EUR', unitCode: 'MON', valueAddedTaxIncluded: false }, availability: 'https://schema.org/InStock', url: SITE + p },
-      { '@type': 'Offer', name: `${pl.name} annuel`, priceCurrency: 'EUR', price: String(pl.year), priceSpecification: { '@type': 'UnitPriceSpecification', price: pl.year, priceCurrency: 'EUR', unitCode: 'ANN', valueAddedTaxIncluded: false }, availability: 'https://schema.org/InStock', url: SITE + p },
+      { '@type': 'Offer', name: `${pl.name} mensuel`, priceCurrency: 'EUR', price: String(pl.month), priceSpecification: { '@type': 'UnitPriceSpecification', price: pl.month, priceCurrency: 'EUR', unitCode: 'MON', valueAddedTaxIncluded: true }, availability: 'https://schema.org/InStock', url: SITE + p },
+      { '@type': 'Offer', name: `${pl.name} annuel`, priceCurrency: 'EUR', price: String(pl.year), priceSpecification: { '@type': 'UnitPriceSpecification', price: pl.year, priceCurrency: 'EUR', unitCode: 'ANN', valueAddedTaxIncluded: true }, availability: 'https://schema.org/InStock', url: SITE + p },
     ],
   }));
-  emit(p, layout({ p, title: 'Tarifs numérisation de courrier dès 9 € HT/mois | Relève', desc: 'Trois formules pour numériser votre courrier : Essentiel 9 €, Pro 29 €, Entreprise 89 € HT par mois. Sans engagement en mensuel, 2 mois offerts en annuel.', body, ld: [orgLd, crumbsLd(trail), ...prod, faqLd(faqKeys)] }));
+  emit(p, layout({ p, title: 'Tarifs numérisation de courrier dès 9 €/mois | Relève', desc: 'Trois formules pour numériser votre courrier : Essentiel 9 €, Pro 29 €, Entreprise 89 € par mois. Sans engagement en mensuel, 2 mois offerts en annuel.', body, ld: [orgLd, crumbsLd(trail), ...prod, faqLd(faqKeys)] }));
 }
 
 /* ---------- FAQ ---------- */
@@ -435,7 +435,7 @@ legal('/cgv/', 'Conditions générales de vente', 'Conditions générales de ven
 <p>Les lettres recommandées sont signées par Relève au nom du Client, qui en autorise expressément la réception. Le délai légal de retrait court à compter de la présentation à l’adresse de Relève, et non de la date de consultation par le Client.</p>
 
 <h2>5. Prix et facturation</h2>
-<p>Les prix sont indiqués en euros, <strong>hors taxes</strong>. La TVA au taux en vigueur est ajoutée lors du paiement. Les tarifs applicables sont ceux affichés sur le site au jour de la souscription. Relève peut les modifier ; toute modification est notifiée au Client par email au moins 30 jours avant son application et ne s’applique qu’au renouvellement suivant.</p>
+<p>Les prix sont indiqués en euros. <strong>TVA non applicable, art. 293 B du CGI</strong> : le prix affiché est le prix à payer. Les tarifs applicables sont ceux affichés sur le site au jour de la souscription. Relève peut les modifier ; toute modification est notifiée au Client par email au moins 30 jours avant son application et ne s’applique qu’au renouvellement suivant.</p>
 <p>Le paiement s’effectue par carte bancaire via la plateforme sécurisée Stripe, à la souscription puis à chaque échéance (mensuelle ou annuelle). Une facture est mise à disposition par Stripe et dans le portail de facturation. En cas d’échec de paiement, Relève peut suspendre le service après relance, et le résilier si l’impayé persiste.</p>
 <p>Pour les clients professionnels, tout retard de paiement entraîne de plein droit des pénalités calculées sur la base de trois fois le taux d’intérêt légal, ainsi qu’une indemnité forfaitaire de 40 € pour frais de recouvrement (articles L. 441-10 et D. 441-5 du Code de commerce).</p>
 
@@ -535,7 +535,7 @@ write('llms.txt', `# ${BRAND}
 ## Services
 ${['/numerisation-courrier-entreprise/', '/scan-courrier-par-email/', '/dematerialisation-courrier-agents-ia/', '/destruction-courrier-confidentiel/', '/reexpedition-courrier-numerique/'].map((x) => `- [${LABEL[x]}](${SITE}${x})`).join('\n')}
 
-## Tarifs (hors taxes)
+## Tarifs (TVA non applicable, art. 293 B du CGI)
 - Essentiel : 9 €/mois (90 €/an), 30 plis/mois
 - Pro : 29 €/mois (290 €/an), 150 plis/mois
 - Entreprise : 89 €/mois (890 €/an), 600 plis/mois, API et webhooks

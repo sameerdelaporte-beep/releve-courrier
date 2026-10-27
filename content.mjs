@@ -48,14 +48,14 @@ export const FAQ = {
   delai: ['Quel est le délai de numérisation ?', "24 heures ouvrées à partir de la réception, du lundi au vendredi hors jours fériés. Un pli reçu le vendredi après la relève est numérisé le lundi."],
   recommandes: ['Les lettres recommandées sont-elles prises en charge ?', "Oui, avec la procuration La Poste que vous signez à l'inscription. Nous retirons vos recommandés, puis l'avis de réception et le contenu sont numérisés comme un pli ordinaire."],
   domiciliation: ['Relève est-il une domiciliation ?', "Non. Vous conservez votre adresse officielle (siège social ou domicile) ; seul votre courrier nous est réexpédié pour être traité. Relève ne peut pas servir d'adresse de siège social."],
-  quota: ['Que se passe-t-il si je dépasse mon nombre de plis ?', "Les plis au-delà du quota sont facturés à l'unité, au tarif indiqué dans votre formule (de 0,25 € à 0,50 € HT). Vous pouvez changer de formule à tout moment depuis votre espace."],
+  quota: ['Que se passe-t-il si je dépasse mon nombre de plis ?', "Les plis au-delà du quota sont facturés à l'unité, au tarif indiqué dans votre formule (de 0,25 € à 0,50 €). Vous pouvez changer de formule à tout moment depuis votre espace."],
   resiliation: ['Puis-je résilier quand je veux ?', "Oui. En formule mensuelle, la résiliation prend effet à la fin du mois en cours. Pensez à mettre fin en même temps à votre service de réexpédition La Poste."],
   valeur: ['Les scans ont-ils une valeur juridique ?', "Un scan est une copie : sa force probante dépend du document et de l'usage que vous en faites. Relève ne propose pas d'archivage à valeur probante certifiée. Pour les actes, titres et contrats dont vous devez conserver l'original, choisissez la réexpédition de l'original."],
   rgpd: ['Mes données sont-elles protégées ?', "Les fichiers sont chiffrés au repos et en transit, hébergés dans l'Union européenne, et les dates de réception, de numérisation, d'envoi et de destruction sont visibles dans votre espace. Un accord de traitement des données (RGPD) est signé avec chaque client professionnel. La durée de conservation dépend de votre formule, et vous pouvez demander l'export ou la suppression de vos données."],
   ia: ['Puis-je connecter mes agents IA à mon courrier ?', "Oui, avec la formule Entreprise : un webhook vous notifie à chaque nouveau pli et une API donne accès au PDF et aux données extraites (expéditeur, type, montant, échéance, références). Vous gardez la main sur ce que chaque agent peut lire."],
   valeurs: ['Que faites-vous des chèques et des pièces d’identité ?', "Ils ne sont jamais détruits. Le pli est numérisé, signalé dans votre espace, puis réexpédié en lettre suivie à l'adresse que vous indiquez."],
   confidentiel: ['Mon courrier peut-il rester fermé ?', "Oui. Vous pouvez demander que les plis portant la mention « Personnel » ou « Confidentiel », ou venant d'expéditeurs que vous désignez, ne soient jamais ouverts. Ils sont alors réexpédiés fermés ou détruits fermés, selon votre choix."],
-  paiement: ['Comment se passe le paiement ?', "Le paiement par carte ou prélèvement SEPA se fait sur une page sécurisée Stripe. Relève ne voit ni ne stocke vos coordonnées bancaires. Une facture avec TVA est envoyée à chaque échéance."],
+  paiement: ['Comment se passe le paiement ?', "Le paiement par carte ou prélèvement SEPA se fait sur une page sécurisée Stripe. Relève ne voit ni ne stocke vos coordonnées bancaires. Une facture (TVA non applicable, art. 293 B du CGI) est envoyée à chaque échéance."],
 };
 
 const L = (path, label) => `<a href="${path}">${label}</a>`;
@@ -189,7 +189,7 @@ ${steps(['Souscrivez une formule sur la page <a href="/tarifs/">tarifs</a>.', 'C
 <h2>Ce que ça change au quotidien</h2>
 ${li(['Les factures arrivent chez votre comptable le jour même, sans que vous les touchiez.', 'Les courriers des impôts et de l’URSSAF vous sont signalés avec leur échéance.', 'Plus de déplacement pour récupérer un recommandé.', 'Votre domicile ou votre atelier n’est plus encombré de papier.'])}
 <h2>La formule adaptée</h2>
-<p>Un indépendant reçoit en général moins de 30 plis par mois : la formule <strong>Essentiel</strong> (9 € HT/mois) suffit. Si vous voulez classement automatique et règles par expéditeur, la formule <strong>Pro</strong> (29 € HT/mois, 150 plis) est faite pour les TPE.</p>
+<p>Un indépendant reçoit en général moins de 30 plis par mois : la formule <strong>Essentiel</strong> (9 €/mois) suffit. Si vous voulez classement automatique et règles par expéditeur, la formule <strong>Pro</strong> (29 €/mois, 150 plis) est faite pour les TPE.</p>
 <h2>Un exemple de réglage</h2>
 ${table(['Expéditeur', 'Action'], [['Fournisseurs', 'PDF au cabinet comptable, original détruit'], ['Impôts, URSSAF', 'PDF à vous et au cabinet, original détruit'], ['Banque, assurances', 'PDF dans votre espace, original détruit'], ['Publicité', 'Détruit sans ouverture'], ['Contrats signés', 'PDF, puis original réexpédié']])}
 <p class="muted">Détail du fonctionnement : <a href="/numerisation-courrier-entreprise/">numérisation de courrier d'entreprise</a>.</p>`,
