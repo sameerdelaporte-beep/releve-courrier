@@ -301,7 +301,7 @@ ${ctaBand()}`;
   const trail = [{ name: 'Accueil', path: '/' }, { name: 'Tarifs', path: p }];
   const faqKeys = ['quota', 'resiliation', 'paiement', 'domiciliation'];
   const body = `${crumbsHtml(trail)}
-<section class="page-hero"><div class="wrap"><p class="eyebrow">Tarifs</p><h1>Tarifs de numérisation de courrier : dès 9&nbsp;€ HT par mois</h1>
+<section class="page-hero"><div class="wrap"><p class="eyebrow">Tarifs</p><h1>Tarifs de numérisation de courrier : dès 9&nbsp;€ par mois</h1>
 <p class="lead">Trois formules selon le nombre de plis reçus chaque mois. Sans engagement en mensuel, deux mois offerts en annuel. Le paiement se fait sur une page sécurisée Stripe.</p></div></section>
 <section class="tight"><div class="wrap"><div class="plans">${PLANS.map((pl) => planCard(pl)).join('')}</div>
 <p class="note">Prix nets : TVA non applicable, art. 293 B du CGI. Réexpédition des originaux : frais postaux refacturés au tarif La Poste en vigueur. Un pli est une enveloppe reçue, quel que soit son nombre de pages.</p></div></section>
