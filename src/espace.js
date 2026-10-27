@@ -147,13 +147,20 @@
   }
 
   function fnUrl(name) { return SB + '/functions/v1/' + name; }
-  function openCertificate(id, btn) {
-    var w = window.open('', '_blank');
-    btn.disabled = true;
+  function openCertificate(id, ref, btn) {
+    var label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Téléchargement…';
     fetch(fnUrl('certificate') + '?item=' + encodeURIComponent(id), { headers: { apikey: KEY, Authorization: 'Bearer ' + session.access_token } })
       .then(function (r) { if (!r.ok) throw new Error('cert'); return r.blob(); })
-      .then(function (b) { btn.disabled = false; var u = URL.createObjectURL(b); if (w) w.location = u; else window.location = u; })
-      .catch(function () { btn.disabled = false; if (w) w.close(); btn.textContent = 'Indisponible'; });
+      .then(function (b) {
+        var u = URL.createObjectURL(b);
+        var a = document.createElement('a');
+        a.href = u; a.download = 'Attestation-destruction-' + (ref || id) + '.pdf';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
+        btn.disabled = false; btn.textContent = label;
+      })
+      .catch(function () { btn.disabled = false; btn.textContent = 'Indisponible'; });
   }
   function notify(body) {
     return fetch(fnUrl('notify'), { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + session.access_token, 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -452,7 +459,7 @@
     }
     var rows = items.map(function (it) {
       var dl = it.pdf_path ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function (e) { openPdf(it.pdf_path, e.currentTarget); } }, ['Télécharger']) : h('span', { class: 'muted', text: '—' });
-      var cert = it.certificate_ref ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Télécharger l’attestation de destruction', onclick: function (e) { openCertificate(it.id, e.currentTarget); } }, [it.certificate_ref]) : h('span', { class: 'muted', text: '—' });
+      var cert = it.certificate_ref ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Télécharger l’attestation de destruction', onclick: function (e) { openCertificate(it.id, it.certificate_ref, e.currentTarget); } }, [it.certificate_ref]) : h('span', { class: 'muted', text: '—' });
       return h('tr', {}, [
         h('td', { text: fmtDate(it.received_at) }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }), h('td', { text: it.folder || '—' }),
         h('td', { text: fmtEur(it.amount_ttc) }), h('td', { text: fmtDate(it.due_date) }),
