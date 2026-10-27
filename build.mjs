@@ -292,7 +292,7 @@ ${ctaBand()}`;
     { '@type': 'WebPage', '@id': SITE + '/#webpage', url: SITE + '/', name: 'Numérisation de courrier d’entreprise sous 24 h', isPartOf: { '@id': `${SITE}/#website` }, about: { '@id': ORG_ID }, inLanguage: 'fr-FR', dateModified: DATE },
     { '@type': 'Service', name: 'Numérisation de courrier professionnel', serviceType: 'Numérisation et traitement de courrier', provider: { '@id': ORG_ID }, areaServed: { '@type': 'Country', name: 'France' }, description: 'Réception, ouverture, numérisation sous 24 h ouvrées, envoi personnalisé et destruction du courrier papier avec attestation.' },
     faqLd(faqKeys)];
-  emit('/', layout({ scripts: [JS_FILE], p: '/', title: 'Numérisation de courrier d’entreprise sous 24 h | Relève', desc: 'Faites suivre votre courrier à Relève : ouverture, scan en PDF sous 24 h ouvrées, envoi par email ou à vos agents IA, destruction attestée. Dès 9 € HT/mois.', body, ld }));
+  emit('/', layout({ scripts: [JS_FILE], p: '/', title: 'Numérisation de courrier d’entreprise sous 24 h | Relève', desc: 'Faites suivre votre courrier à Relève : ouverture, scan en PDF sous 24 h ouvrées, envoi par email ou à vos agents IA, destruction attestée. Dès 9 €/mois.', body, ld }));
 }
 
 /* ---------- Tarifs ---------- */

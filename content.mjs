@@ -68,7 +68,7 @@ export const PAGES = [
   {
     path: '/numerisation-courrier-entreprise/', kind: 'service', service: 'Numérisation de courrier professionnel',
     title: "Numérisation de courrier d'entreprise | Relève",
-    desc: "Relève ouvre, scanne en PDF et classe le courrier papier de votre société sous 24 h ouvrées. Envoi par email, espace client ou API. Dès 9 € HT/mois.",
+    desc: "Relève ouvre, scanne en PDF et classe le courrier papier de votre société sous 24 h ouvrées. Envoi par email, espace client ou API. Dès 9 €/mois.",
     h1: 'Numérisation de courrier pour les entreprises', eyebrow: 'Service principal',
     lead: "Relève ouvre, scanne et classe le courrier papier de votre société, puis le met à votre disposition en PDF avec texte recherchable. Plus de tri au bureau, plus de plis oubliés dans un tiroir.",
     faq: ['delai', 'original', 'recommandes', 'valeur'],
@@ -180,7 +180,7 @@ ${steps(['Souscrivez une formule sur la page <a href="/tarifs/">tarifs</a>.', 'C
   {
     path: '/pour/tpe-independants/', kind: 'service', service: 'Numérisation de courrier pour TPE et indépendants',
     title: 'Numérisation de courrier pour TPE et indépendants | Relève',
-    desc: "Indépendant, artisan, gérant de TPE : ne triez plus votre courrier. Relève le scanne, l'envoie à votre comptable et détruit l'original. Dès 9 € HT/mois.",
+    desc: "Indépendant, artisan, gérant de TPE : ne triez plus votre courrier. Relève le scanne, l'envoie à votre comptable et détruit l'original. Dès 9 €/mois.",
     h1: 'Courrier numérisé pour TPE et indépendants', eyebrow: 'Pour qui : TPE et indépendants',
     lead: "Vous passez vos journées chez vos clients ou sur les routes. Le courrier s'entasse, et une échéance manquée coûte plus cher que l'abonnement.",
     faq: ['delai', 'recommandes', 'resiliation', 'quota'],
