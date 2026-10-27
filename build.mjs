@@ -7,7 +7,7 @@ import { PAGES, PLANS, MODES, MODE_LABELS, FAQ } from './content.mjs';
 const cfg = JSON.parse(fs.readFileSync('./site.config.json', 'utf8'));
 const SITE = (process.env.SITE_URL || cfg.siteUrl).replace(/\/$/, '');
 const BRAND = cfg.brand;
-const DATE = '2026-10-08';
+const DATE = '2026-10-27';
 const OUT = 'dist';
 const ORG_ID = `${SITE}/#organization`;
 
