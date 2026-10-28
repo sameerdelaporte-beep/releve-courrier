@@ -12,7 +12,7 @@ function cors(req: Request) {
 }
 const fr = (d?: string | null) => (d ? new Date(d).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" }) : "—");
 const frTime = (d?: string | null) => (d ? new Date(d).toLocaleString("fr-FR", { timeZone: "Europe/Paris" }) : "—");
-const DOC: Record<string, string> = { facture: "Facture", administratif: "Administratif", banque: "Banque", assurance: "Assurance", contrat: "Contrat", recommande: "Recommandé", autre: "Autre" };
+const DOC: Record<string, string> = { facture: "Facture", impots: "Impôts", juridique: "Juridique", administratif: "Administratif", banque: "Banque", assurance: "Assurance", contrat: "Contrat", recommande: "Recommandé", autre: "Autre" };
 
 async function sha256(s: string) {
   const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));

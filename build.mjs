@@ -558,7 +558,7 @@ write('_headers', `/*
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ${SB_URL}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ${SB_URL}; frame-src blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
 /espace/*
   X-Robots-Tag: noindex, nofollow
 /assets/*
@@ -587,7 +587,7 @@ Header always set X-Frame-Options "DENY"
 Header always set Referrer-Policy "strict-origin-when-cross-origin"
 Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ${SB_URL}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ${SB_URL}; frame-src blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 <FilesMatch "\\.(css|js)$">
 Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>

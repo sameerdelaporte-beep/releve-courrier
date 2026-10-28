@@ -15,7 +15,7 @@
   var TREATMENT = { emailespace: 'Email + espace client', espace: 'Espace client', email: 'Email', api: 'Agents IA / API', reexpedition: 'Réexpédition de l’original', destruction: 'Destruction sans ouverture' };
   var DEFAULT_TREATMENT = { emailespace: TREATMENT.emailespace, espace: 'Espace client uniquement', email: 'Email uniquement', api: TREATMENT.api, reexpedition: 'Numérisation puis réexpédition' };
   var STATUS_ITEM = { recu: 'Reçu', numerise: 'Numérisé', envoye: 'Envoyé', detruit: 'Détruit', reexpedie: 'Réexpédié' };
-  var DOC = { facture: 'Facture', administratif: 'Administratif', banque: 'Banque', assurance: 'Assurance', contrat: 'Contrat', recommande: 'Recommandé', autre: 'Autre' };
+  var DOC = { facture: 'Facture', impots: 'Impôts', administratif: 'Administratif', banque: 'Banque', assurance: 'Assurance', contrat: 'Contrat', juridique: 'Juridique', recommande: 'Recommandé', autre: 'Autre' };
 
   /* ---------- Utilitaires ---------- */
   function h(tag, attrs, kids) {
@@ -184,7 +184,6 @@
     var body = h('div', { class: 'app-body' }, [h('p', { class: 'muted', text: 'Chargement…' })]);
     root.appendChild(body);
 
-    var me = String(email).toLowerCase();
     api('/rest/v1/customers?select=*&limit=1').then(function (r) { return r.ok ? json(r) : null; }).then(function (rows) {
       if (rows && rows.length) return { c: rows[0], member: false };
       return api('/rest/v1/rpc/member_account', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
@@ -204,56 +203,320 @@
       var c = res.c, member = res.member;
       var active = c.status === 'active';
       var advanced = (c.plan === 'pro' || c.plan === 'entreprise');
+
+      var panelMail = h('div', { id: 'panel-mail', role: 'tabpanel', 'aria-labelledby': 'tab-mail', class: 'app-body' });
+      var panelAcc = h('div', { id: 'panel-acc', role: 'tabpanel', 'aria-labelledby': 'tab-acc', class: 'app-body' });
+      var tabMail = h('button', { id: 'tab-mail', class: 'tab', type: 'button', role: 'tab', 'aria-controls': 'panel-mail' }, ['Mon courrier']);
+      var tabAcc = h('button', { id: 'tab-acc', class: 'tab', type: 'button', role: 'tab', 'aria-controls': 'panel-acc' }, [member ? 'Compte' : 'Mon compte']);
+      function show(which) {
+        var m = which !== 'acc';
+        tabMail.setAttribute('aria-selected', m ? 'true' : 'false'); tabAcc.setAttribute('aria-selected', m ? 'false' : 'true');
+        tabMail.tabIndex = m ? 0 : -1; tabAcc.tabIndex = m ? -1 : 0;
+        if (m) { panelMail.removeAttribute('hidden'); panelAcc.setAttribute('hidden', 'hidden'); } else { panelAcc.removeAttribute('hidden'); panelMail.setAttribute('hidden', 'hidden'); }
+        store.set('rlv_tab', m ? 'mail' : 'acc');
+      }
+      tabMail.addEventListener('click', function () { show('mail'); });
+      tabAcc.addEventListener('click', function () { show('acc'); });
+      [tabMail, tabAcc].forEach(function (t) {
+        t.addEventListener('keydown', function (e) {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { var next = t === tabMail ? tabAcc : tabMail; show(next === tabMail ? 'mail' : 'acc'); next.focus(); }
+        });
+      });
+      body.appendChild(h('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Sections de l’espace client' }, [tabMail, tabAcc]));
+      body.appendChild(panelMail); body.appendChild(panelAcc);
+
+      mailPanel(panelMail, { advanced: advanced, plan: c.plan });
+
       if (member) {
-        body.appendChild(h('div', { class: 'app-card' }, [
+        panelAcc.appendChild(h('div', { class: 'app-card' }, [
           h('h3', { text: (c.company || c.name || 'Compte') + ' · ' + (PLAN[c.plan] || c.plan) }),
           h('p', { class: 'muted', text: 'Vous consultez ce compte en tant qu’utilisateur invité par ' + c.owner_email + '. Référence client : ' + c.reference + '.' })
         ]));
       } else {
-        body.appendChild(accountCard(c));
+        panelAcc.appendChild(accountCard(c));
+        panelAcc.appendChild(prefsCard(c));
+        if (advanced && active) { panelAcc.appendChild(rulesCard(c)); panelAcc.appendChild(teamCard(c)); }
+        if (c.plan === 'entreprise' && active) panelAcc.appendChild(apiCard(c));
       }
-      var itemsBox = h('div', { class: 'app-card' });
-      body.appendChild(itemsBox);
-      itemsPanel(itemsBox, advanced);
-      if (!member) {
-        if (advanced && active) { body.appendChild(rulesCard(c)); body.appendChild(teamCard(c)); }
-        if (c.plan === 'entreprise' && active) body.appendChild(apiCard(c));
-        body.appendChild(prefsCard(c));
-      }
+      show(store.get('rlv_tab') === 'acc' ? 'acc' : 'mail');
     }).catch(function () {
       clear(body); body.appendChild(h('p', { class: 'note', text: 'Impossible de charger vos données. Réessayez dans un instant.' }));
     });
   }
 
-  /* Liste des plis : recherche plein texte et dossiers (formules Pro et Entreprise) */
-  function itemsPanel(box, advanced) {
-    var state = { q: '', folder: '' };
-    var holder = h('div', {});
+  /* ---------- Courrier : liste, filtres, aperçu, exports ---------- */
+  var TYPE_ORDER = ['facture', 'impots', 'administratif', 'banque', 'assurance', 'contrat', 'juridique', 'recommande', 'autre'];
+  var PERIODS = { '': 'Toute la période', '30': '30 derniers jours', '90': '3 derniers mois', '365': '12 derniers mois' };
+  var SORTS = { recent: 'Plus récents', old: 'Plus anciens', sender: 'Expéditeur (A→Z)', amount: 'Montant décroissant', due: 'Échéance proche' };
+
+  function todayIso() { return new Date().toISOString().slice(0, 10); }
+  function daysFrom(iso) { return Math.round((Date.parse(iso + 'T00:00:00Z') - Date.parse(todayIso() + 'T00:00:00Z')) / 86400000); }
+  function slug(s) { return String(s || 'courrier').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'courrier'; }
+  function fileName(it, n) { return String(it.received_at).slice(0, 10) + '_' + slug(it.sender) + '_' + (it.doc_type || 'pli') + (n ? '_' + n : '') + '.pdf'; }
+  function saveBlob(blob, name) {
+    var u = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
+  }
+  function fetchPdf(path) {
+    return api('/storage/v1/object/sign/plis/' + path.split('/').map(encodeURIComponent).join('/'), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ expiresIn: 120 })
+    }).then(json).then(function (j) {
+      if (!j || !j.signedURL) throw new Error('sign');
+      return fetch(SB + '/storage/v1' + j.signedURL);
+    }).then(function (r) { if (!r.ok) throw new Error('get'); return r.blob(); });
+  }
+  function csvCell(v) {
+    var s = v == null ? '' : String(v);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  var CRC = (function () { var t = [], c, n, k; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(u8) { var c = 0xFFFFFFFF; for (var i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function zipStore(files) { // files : [{name, data:Uint8Array}] ; méthode « stored », sans compression
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0, d = new Date();
+    var dosTime = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+    var dosDate = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+    files.forEach(function (f) {
+      var name = enc.encode(f.name), crc = crc32(f.data), sz = f.data.length;
+      var lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true);
+      lh.setUint16(10, dosTime, true); lh.setUint16(12, dosDate, true); lh.setUint32(14, crc, true); lh.setUint32(18, sz, true); lh.setUint32(22, sz, true);
+      lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+      parts.push(lh.buffer, name, f.data);
+      var ch = new DataView(new ArrayBuffer(46));
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+      ch.setUint16(12, dosTime, true); ch.setUint16(14, dosDate, true); ch.setUint32(16, crc, true); ch.setUint32(20, sz, true); ch.setUint32(24, sz, true);
+      ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+      central.push(ch.buffer, name);
+      offset += 30 + name.length + sz;
+    });
+    var csize = 0; central.forEach(function (p) { csize += p.byteLength || p.length; });
+    var end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, offset, true);
+    return new Blob(parts.concat(central, [end.buffer]), { type: 'application/zip' });
+  }
+
+  function itemTodo(it) { return !!it.due_date && !it.handled_at && it.status !== 'detruit'; }
+  function itemNew(it) { return !it.opened_at && !!it.pdf_path; }
+
+  function openPreview(it, onOpened) {
+    var dlg = h('dialog', { class: 'preview', 'aria-label': 'Aperçu du pli' });
+    var frameBox = h('div', { class: 'preview-body' }, [h('p', { class: 'muted', text: 'Chargement du PDF…' })]);
+    var close = h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () { dlg.close(); } }, ['Fermer']);
+    var title = (it.sender || 'Pli') + ' · ' + fmtDate(it.received_at);
+    var dl = h('button', { class: 'btn btn-primary btn-sm', type: 'button' }, ['Télécharger']);
+    dlg.appendChild(h('div', { class: 'preview-top' }, [h('strong', { text: title }), h('span', { class: 'preview-actions' }, [dl, close])]));
+    dlg.appendChild(frameBox);
+    document.body.appendChild(dlg);
+    var objectUrl = null, blobRef = null;
+    dlg.addEventListener('close', function () { if (objectUrl) URL.revokeObjectURL(objectUrl); if (dlg.parentNode) dlg.parentNode.removeChild(dlg); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    dl.addEventListener('click', function () { if (blobRef) saveBlob(blobRef, fileName(it)); });
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', 'open');
+    fetchPdf(it.pdf_path).then(function (blob) {
+      blobRef = blob; objectUrl = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+      clear(frameBox);
+      frameBox.appendChild(h('iframe', { src: objectUrl, title: 'PDF : ' + title, class: 'preview-frame' }));
+      onOpened();
+    }).catch(function () { clear(frameBox); frameBox.appendChild(h('p', { class: 'note', text: 'Aperçu indisponible. Utilisez « Télécharger ».' })); });
+  }
+
+  function mailPanel(box, opts) {
+    var advanced = opts.advanced;
+    var all = [];
+    var st = { q: '', type: '', status: '', period: '', folder: '', todo: false, sort: 'recent' };
+    var statsBox = h('div', { class: 'stats' });
+    var chipsBox = h('div', { class: 'chips', role: 'group', 'aria-label': 'Filtrer par type de document' });
+    var listBox = h('div', {});
+    var info = h('p', { class: 'muted', role: 'status', 'aria-live': 'polite' });
     var q = h('input', { type: 'search', placeholder: 'Rechercher : expéditeur, référence, contenu…', 'aria-label': 'Rechercher dans mes plis', maxlength: '100' });
+    function sel(label, map, key, extra) {
+      var s = h('select', { 'aria-label': label }, (extra || []).concat(Object.keys(map).map(function (k) { return opt(k, map[k]); })));
+      s.addEventListener('change', function () { st[key] = s.value; render(); });
+      return s;
+    }
+    var statusSel = sel('Statut', STATUS_ITEM, 'status', [opt('', 'Tous les statuts')]);
+    var periodSel = sel('Période', PERIODS, 'period');
+    var sortSel = sel('Trier par', SORTS, 'sort');
     var folderSel = h('select', { 'aria-label': 'Dossier' }, [opt('', 'Tous les dossiers')]);
-    var go = h('button', { class: 'btn btn-ghost btn-sm', type: 'submit' }, ['Rechercher']);
-    var bar = h('form', { class: 'searchbar', role: 'search', novalidate: 'novalidate' }, [q, folderSel, go]);
-    bar.addEventListener('submit', function (e) { e.preventDefault(); state.q = q.value.trim(); state.folder = folderSel.value; load(); });
-    folderSel.addEventListener('change', function () { state.folder = folderSel.value; load(); });
+    folderSel.addEventListener('change', function () { st.folder = folderSel.value; render(); });
+    var todoBtn = h('button', { class: 'chip', type: 'button', 'aria-pressed': 'false', onclick: function () { st.todo = !st.todo; render(); } }, ['À traiter']);
+    var form = h('form', { class: 'toolbar', role: 'search', novalidate: 'novalidate' }, [q, h('button', { class: 'btn btn-ghost btn-sm', type: 'submit' }, ['Rechercher'])]);
+    form.addEventListener('submit', function (e) { e.preventDefault(); st.q = q.value.trim(); load(); });
+    q.addEventListener('search', function () { if (!q.value && st.q) { st.q = ''; load(); } });
+    var filters = h('div', { class: 'filters' }, [statusSel, periodSel].concat(advanced ? [folderSel] : [], [sortSel]));
+    var exportCsv = h('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, ['Exporter en CSV']);
+    var exportZip = h('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, ['Télécharger les PDF (ZIP)']);
+    var exMsg = h('span', { class: 'muted', role: 'status' });
+
+    box.appendChild(statsBox);
+    var card = h('div', { class: 'app-card' }, [h('h3', { text: 'Mes plis' }), form]);
+    if (advanced) card.appendChild(chipsBox);
+    else card.appendChild(h('p', { class: 'hint lock' }, ['Classer par type (facture, impôts, banque…) et par dossier : ', h('a', { href: '/tarifs/' }, ['disponible avec la formule Pro']), '.']));
+    card.appendChild(filters);
+    card.appendChild(info);
+    card.appendChild(listBox);
+    card.appendChild(h('div', { class: 'export-row' }, [exportCsv, exportZip, exMsg]));
+    box.appendChild(card);
+
     function load() {
-      var url = '/rest/v1/mail_items?select=*&order=received_at.desc,created_at.desc&limit=200';
-      if (state.q) url += '&search=wfts(french).' + encodeURIComponent(state.q.replace(/[(),]/g, ' '));
-      if (state.folder) url += '&folder=eq.' + encodeURIComponent(state.folder);
-      holder.textContent = 'Chargement…';
-      api(url).then(function (r) { return r.ok ? json(r) : []; }).then(function (items) {
-        renderItems(holder, items || [], !!(state.q || state.folder));
-      }).catch(function () { holder.textContent = 'Chargement impossible.'; });
+      var url = '/rest/v1/mail_items?select=*&order=received_at.desc,created_at.desc&limit=500';
+      if (st.q) url += '&search=wfts(french).' + encodeURIComponent(st.q.replace(/[(),]/g, ' '));
+      listBox.textContent = 'Chargement…';
+      api(url).then(function (r) { return r.ok ? json(r) : []; }).then(function (items) { all = items || []; render(); })
+        .catch(function () { listBox.textContent = 'Chargement impossible.'; });
     }
-    box.appendChild(h('h3', { text: 'Mes plis' }));
-    if (advanced) {
-      box.appendChild(bar);
-      api('/rest/v1/mail_items?select=folder&folder=not.is.null&limit=1000').then(function (r) { return r.ok ? json(r) : []; }).then(function (rows) {
-        var seen = {};
-        (rows || []).forEach(function (x) { if (x.folder) seen[x.folder] = 1; });
-        Object.keys(seen).sort().forEach(function (f) { folderSel.appendChild(opt(f, f)); });
+
+    function filtered() {
+      var now = todayIso(), out = all.filter(function (it) {
+        if (st.type && it.doc_type !== st.type) return false;
+        if (st.status && it.status !== st.status) return false;
+        if (st.folder && it.folder !== st.folder) return false;
+        if (st.todo && !itemTodo(it)) return false;
+        if (st.period) { var age = -daysFrom(String(it.received_at).slice(0, 10)); if (age > Number(st.period)) return false; }
+        return true;
       });
+      var cmp = {
+        recent: function (a, b) { return String(b.received_at).localeCompare(String(a.received_at)); },
+        old: function (a, b) { return String(a.received_at).localeCompare(String(b.received_at)); },
+        sender: function (a, b) { return String(a.sender || '').localeCompare(String(b.sender || ''), 'fr'); },
+        amount: function (a, b) { return (Number(b.amount_ttc) || -1) - (Number(a.amount_ttc) || -1); },
+        due: function (a, b) { return String(a.due_date || '9999').localeCompare(String(b.due_date || '9999')); }
+      }[st.sort];
+      return out.sort(cmp);
     }
-    box.appendChild(holder);
+
+    function renderStats() {
+      var nNew = all.filter(itemNew).length, todo = all.filter(itemTodo);
+      var late = todo.filter(function (it) { return daysFrom(String(it.due_date).slice(0, 10)) < 0; }).length;
+      var next = todo.filter(function (it) { return daysFrom(String(it.due_date).slice(0, 10)) >= 0; }).sort(function (a, b) { return String(a.due_date).localeCompare(String(b.due_date)); })[0];
+      clear(statsBox);
+      function stat(label, value, sub, tone) { return h('div', { class: 'stat ' + (tone || '') }, [h('span', { class: 'stat-label', text: label }), h('strong', { class: 'stat-value', text: value }), h('span', { class: 'stat-sub', text: sub || '' })]); }
+      statsBox.appendChild(stat('Nouveaux plis', String(nNew), nNew ? 'à consulter' : 'tout est lu', nNew ? 'new' : ''));
+      statsBox.appendChild(stat('À traiter', String(todo.length), late ? late + ' en retard' : (todo.length ? 'avec échéance' : 'rien en attente'), late ? 'late' : ''));
+      statsBox.appendChild(stat('Prochaine échéance', next ? fmtDate(next.due_date) : '—', next ? (next.sender || '') + (next.amount_ttc != null ? ' · ' + fmtEur(next.amount_ttc) : '') : 'aucune', ''));
+      statsBox.appendChild(stat('Plis reçus', String(all.length), 'dans la période chargée', ''));
+    }
+
+    function renderChips() {
+      clear(chipsBox);
+      var counts = {}; all.forEach(function (it) { counts[it.doc_type] = (counts[it.doc_type] || 0) + 1; });
+      function chip(label, value, n) {
+        var on = st.type === value;
+        return h('button', { class: 'chip', type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: function () { st.type = value; render(); } }, [label + (n != null ? ' ' : ''), n != null ? h('span', { class: 'chip-n', text: String(n) }) : null]);
+      }
+      chipsBox.appendChild(chip('Tous', '', all.length));
+      TYPE_ORDER.forEach(function (k) { if (counts[k]) chipsBox.appendChild(chip(DOC[k], k, counts[k])); });
+      todoBtn.setAttribute('aria-pressed', st.todo ? 'true' : 'false');
+      chipsBox.appendChild(todoBtn);
+    }
+
+    function renderFolders() {
+      var seen = {}; all.forEach(function (it) { if (it.folder) seen[it.folder] = 1; });
+      clear(folderSel); folderSel.appendChild(opt('', 'Tous les dossiers'));
+      Object.keys(seen).sort().forEach(function (f) { folderSel.appendChild(opt(f, f)); });
+      folderSel.value = seen[st.folder] ? st.folder : '';
+    }
+
+    function dueNode(it) {
+      if (!it.due_date) return null;
+      var d = daysFrom(String(it.due_date).slice(0, 10));
+      if (it.handled_at || it.status === 'detruit') return h('span', { class: 'due', text: 'Échéance ' + fmtDate(it.due_date) });
+      if (d < 0) return h('span', { class: 'due late', text: 'En retard · ' + fmtDate(it.due_date) });
+      if (d <= 7) return h('span', { class: 'due soon', text: (d === 0 ? 'Aujourd’hui' : 'Dans ' + d + ' j') + ' · ' + fmtDate(it.due_date) });
+      return h('span', { class: 'due', text: 'Échéance ' + fmtDate(it.due_date) });
+    }
+
+    function row(it) {
+      var meta = [h('span', { class: 'badge', text: DOC[it.doc_type] || it.doc_type })];
+      if (it.folder) meta.push(h('span', { class: 'meta-folder', text: it.folder }));
+      if (it.reference) meta.push(h('span', { class: 'meta-ref mono', text: it.reference }));
+      var actions = [];
+      if (it.pdf_path) {
+        actions.push(h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: function () {
+          openPreview(it, function () { markOpened(it); });
+        } }, ['Aperçu']));
+        actions.push(h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function (e) {
+          var b = e.currentTarget, t = b.textContent; b.disabled = true; b.textContent = '…';
+          fetchPdf(it.pdf_path).then(function (blob) { saveBlob(blob, fileName(it)); markOpened(it); b.disabled = false; b.textContent = t; })
+            .catch(function () { b.disabled = false; b.textContent = 'Indisponible'; });
+        } }, ['Télécharger']));
+      }
+      if (it.certificate_ref) actions.push(h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Attestation de destruction', onclick: function (e) { openCertificate(it.id, it.certificate_ref, e.currentTarget); } }, ['Attestation']));
+      var handled = null;
+      if (it.due_date || it.amount_ttc != null) {
+        var cb = h('input', { type: 'checkbox', checked: it.handled_at ? 'checked' : false });
+        cb.addEventListener('change', function () {
+          var done = cb.checked; cb.disabled = true;
+          api('/rest/v1/rpc/set_item_handled', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_id: it.id, p_done: done }) })
+            .then(function (r) { cb.disabled = false; if (r.ok) { it.handled_at = done ? new Date().toISOString() : null; render(); } else cb.checked = !done; })
+            .catch(function () { cb.disabled = false; cb.checked = !done; });
+        });
+        handled = h('label', { class: 'handled' }, [cb, ' Traité']);
+      }
+      return h('li', { class: 'pli' + (itemNew(it) ? ' is-new' : '') }, [
+        h('div', { class: 'pli-main' }, [
+          h('div', { class: 'pli-title' }, [itemNew(it) ? h('span', { class: 'dot', title: 'Nouveau', role: 'img', 'aria-label': 'Nouveau pli' }) : null, h('strong', { text: it.sender || 'Expéditeur inconnu' }), h('span', { class: 'pli-date', text: fmtDate(it.received_at) })]),
+          h('div', { class: 'pli-meta' }, meta)
+        ]),
+        h('div', { class: 'pli-amount' }, [it.amount_ttc != null ? h('strong', { text: fmtEur(it.amount_ttc) }) : h('span', { class: 'muted', text: '—' }), dueNode(it)]),
+        h('div', { class: 'pli-status' }, [badge(STATUS_ITEM[it.status] || it.status, it.status === 'detruit' || it.status === 'reexpedie' ? '' : 'ok'), handled]),
+        h('div', { class: 'pli-actions' }, actions)
+      ]);
+    }
+
+    function markOpened(it) {
+      if (it.opened_at) return;
+      it.opened_at = new Date().toISOString();
+      api('/rest/v1/rpc/mark_item_opened', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_id: it.id }) }).catch(function () {});
+      render();
+    }
+
+    function render() {
+      renderStats(); if (advanced) { renderChips(); renderFolders(); }
+      statusSel.value = st.status; periodSel.value = st.period; sortSel.value = st.sort;
+      var list = filtered();
+      var f = !!(st.q || st.type || st.status || st.period || st.folder || st.todo);
+      info.textContent = all.length ? list.length + (list.length > 1 ? ' plis' : ' pli') + (f ? ' correspondant à vos filtres' : '') : '';
+      clear(listBox);
+      if (!list.length) {
+        listBox.appendChild(h('div', { class: 'empty' }, [
+          h('strong', { text: f ? 'Aucun pli ne correspond à ces filtres.' : 'Aucun pli pour le moment.' }),
+          h('p', { class: 'muted', text: f ? 'Modifiez la recherche ou réinitialisez les filtres.' : 'Vos plis numérisés apparaîtront ici dès leur réception, sous 24 h ouvrées.' }),
+          f ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () { st.q = ''; st.type = ''; st.status = ''; st.period = ''; st.folder = ''; st.todo = false; q.value = ''; load(); } }, ['Réinitialiser les filtres']) : null
+        ]));
+      } else listBox.appendChild(h('ul', { class: 'pli-list' }, list.map(row)));
+      exportCsv.disabled = exportZip.disabled = !list.length;
+    }
+
+    exportCsv.addEventListener('click', function () {
+      var head = ['Date de réception', 'Expéditeur', 'Type', 'Dossier', 'Référence', 'Montant TTC', 'Échéance', 'Statut', 'Traité', 'Conservé jusqu’au'];
+      var lines = [head.map(csvCell).join(';')].concat(filtered().map(function (it) {
+        return [fmtDate(it.received_at), it.sender, DOC[it.doc_type] || it.doc_type, it.folder, it.reference, it.amount_ttc == null ? '' : Number(it.amount_ttc).toFixed(2).replace('.', ','), it.due_date ? fmtDate(it.due_date) : '', STATUS_ITEM[it.status] || it.status, it.handled_at ? 'oui' : 'non', fmtDate(it.expires_at)].map(csvCell).join(';');
+      }));
+      saveBlob(new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }), 'releve-plis-' + todayIso() + '.csv');
+    });
+
+    exportZip.addEventListener('click', function () {
+      var items = filtered().filter(function (it) { return it.pdf_path; }).slice(0, 50);
+      if (!items.length) { exMsg.textContent = 'Aucun PDF dans cette sélection.'; return; }
+      exportZip.disabled = true; var done = 0, files = [], used = {};
+      exMsg.textContent = 'Préparation… 0/' + items.length;
+      items.reduce(function (p, it) {
+        return p.then(function () {
+          return fetchPdf(it.pdf_path).then(function (b) { return b.arrayBuffer(); }).then(function (buf) {
+            var n = fileName(it), k = 1; while (used[n]) { k++; n = fileName(it, k); } used[n] = 1;
+            files.push({ name: n, data: new Uint8Array(buf) }); done++; exMsg.textContent = 'Préparation… ' + done + '/' + items.length;
+          });
+        });
+      }, Promise.resolve()).then(function () {
+        saveBlob(zipStore(files), 'releve-plis-' + todayIso() + '.zip');
+        exMsg.textContent = done + ' PDF dans le ZIP' + (filtered().filter(function (it) { return it.pdf_path; }).length > 50 ? ' (50 maximum par téléchargement)' : '') + '.';
+        exportZip.disabled = false;
+      }).catch(function () { exMsg.textContent = 'Téléchargement impossible.'; exportZip.disabled = false; });
+    });
+
     load();
   }
 
@@ -451,28 +714,6 @@
       h('h4', { text: 'Webhook' }), form,
       h('h4', { text: 'Exemples' }), h('pre', { class: 'mono codebox', text: doc })
     ]);
-  }
-
-  function renderItems(box, items, filtered) {
-    clear(box);
-    if (!items.length) {
-      box.appendChild(h('p', { class: 'muted', text: filtered ? 'Aucun pli ne correspond à cette recherche.' : 'Aucun pli pour le moment. Vos plis numérisés apparaîtront ici dès leur réception.' }));
-      return;
-    }
-    var rows = items.map(function (it) {
-      var dl = it.pdf_path ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function (e) { openPdf(it.pdf_path, e.currentTarget); } }, ['Télécharger']) : h('span', { class: 'muted', text: '—' });
-      var cert = it.certificate_ref ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', title: 'Télécharger l’attestation de destruction', onclick: function (e) { openCertificate(it.id, it.certificate_ref, e.currentTarget); } }, [it.certificate_ref]) : h('span', { class: 'muted', text: '—' });
-      return h('tr', {}, [
-        h('td', { text: fmtDate(it.received_at) }), h('td', { text: it.sender || '—' }), h('td', { text: DOC[it.doc_type] || it.doc_type }), h('td', { text: it.folder || '—' }),
-        h('td', { text: fmtEur(it.amount_ttc) }), h('td', { text: fmtDate(it.due_date) }),
-        h('td', {}, [badge(STATUS_ITEM[it.status] || it.status)]),
-        h('td', {}, [cert]), h('td', {}, [dl]), h('td', { text: fmtDate(it.expires_at) })
-      ]);
-    });
-    box.appendChild(h('div', { class: 'tablewrap' }, [h('table', {}, [
-      h('thead', {}, [h('tr', {}, ['Reçu le', 'Expéditeur', 'Type', 'Dossier', 'Montant TTC', 'Échéance', 'Statut', 'Attestation', 'PDF', 'Conservé jusqu’au'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]),
-      h('tbody', {}, rows)
-    ])]));
   }
 
   /* ---------- Espace opérateur ---------- */
