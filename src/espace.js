@@ -326,7 +326,6 @@
     var advanced = opts.advanced;
     var all = [];
     var st = { q: '', type: '', status: '', period: '', folder: '', todo: false, sort: 'recent' };
-    var statsBox = h('div', { class: 'stats' });
     var chipsBox = h('div', { class: 'chips', role: 'group', 'aria-label': 'Filtrer par type de document' });
     var listBox = h('div', {});
     var info = h('p', { class: 'muted', role: 'status', 'aria-live': 'polite' });
@@ -350,7 +349,6 @@
     var exportZip = h('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, ['Télécharger les PDF (ZIP)']);
     var exMsg = h('span', { class: 'muted', role: 'status' });
 
-    box.appendChild(statsBox);
     var card = h('div', { class: 'app-card' }, [h('h3', { text: 'Mes plis' }), form]);
     if (advanced) card.appendChild(chipsBox);
     else card.appendChild(h('p', { class: 'hint lock' }, ['Classer par type (facture, impôts, banque…) et par dossier : ', h('a', { href: '/tarifs/' }, ['disponible avec la formule Pro']), '.']));
@@ -385,18 +383,6 @@
         due: function (a, b) { return String(a.due_date || '9999').localeCompare(String(b.due_date || '9999')); }
       }[st.sort];
       return out.sort(cmp);
-    }
-
-    function renderStats() {
-      var nNew = all.filter(itemNew).length, todo = all.filter(itemTodo);
-      var late = todo.filter(function (it) { return daysFrom(String(it.due_date).slice(0, 10)) < 0; }).length;
-      var next = todo.filter(function (it) { return daysFrom(String(it.due_date).slice(0, 10)) >= 0; }).sort(function (a, b) { return String(a.due_date).localeCompare(String(b.due_date)); })[0];
-      clear(statsBox);
-      function stat(label, value, sub, tone) { return h('div', { class: 'stat ' + (tone || '') }, [h('span', { class: 'stat-label', text: label }), h('strong', { class: 'stat-value', text: value }), h('span', { class: 'stat-sub', text: sub || '' })]); }
-      statsBox.appendChild(stat('Nouveaux plis', String(nNew), nNew ? 'à consulter' : 'tout est lu', nNew ? 'new' : ''));
-      statsBox.appendChild(stat('À traiter', String(todo.length), late ? late + ' en retard' : (todo.length ? 'avec échéance' : 'rien en attente'), late ? 'late' : ''));
-      statsBox.appendChild(stat('Prochaine échéance', next ? fmtDate(next.due_date) : '—', next ? (next.sender || '') + (next.amount_ttc != null ? ' · ' + fmtEur(next.amount_ttc) : '') : 'aucune', ''));
-      statsBox.appendChild(stat('Plis reçus', String(all.length), 'dans la période chargée', ''));
     }
 
     function renderChips() {
@@ -455,9 +441,9 @@
         });
         handled = h('label', { class: 'handled' }, [cb, ' Traité']);
       }
-      return h('li', { class: 'pli' + (itemNew(it) ? ' is-new' : '') }, [
+      return h('li', { class: 'pli' }, [
         h('div', { class: 'pli-main' }, [
-          h('div', { class: 'pli-title' }, [itemNew(it) ? h('span', { class: 'dot', title: 'Nouveau', role: 'img', 'aria-label': 'Nouveau pli' }) : null, h('strong', { text: it.sender || 'Expéditeur inconnu' }), h('span', { class: 'pli-date', text: fmtDate(it.received_at) })]),
+          h('div', { class: 'pli-title' }, [h('strong', { text: it.sender || 'Expéditeur inconnu' }), itemNew(it) ? h('span', { class: 'pill-new', text: 'Nouveau' }) : null, h('span', { class: 'pli-date', text: fmtDate(it.received_at) })]),
           h('div', { class: 'pli-meta' }, meta)
         ]),
         h('div', { class: 'pli-amount' }, [it.amount_ttc != null ? h('strong', { text: fmtEur(it.amount_ttc) }) : h('span', { class: 'muted', text: '—' }), dueNode(it)]),
@@ -474,7 +460,7 @@
     }
 
     function render() {
-      renderStats(); if (advanced) { renderChips(); renderFolders(); }
+      if (advanced) { renderChips(); renderFolders(); }
       statusSel.value = st.status; periodSel.value = st.period; sortSel.value = st.sort;
       var list = filtered();
       var f = !!(st.q || st.type || st.status || st.period || st.folder || st.todo);
