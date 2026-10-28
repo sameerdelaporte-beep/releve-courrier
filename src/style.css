@@ -336,3 +336,62 @@ dialog.preview::backdrop{background:rgba(10,12,24,.55)}
 .preview-frame{width:100%;height:100%;border:0;background:#fff}
 
 .pill-new{font:700 .72rem var(--f-body);letter-spacing:.04em;text-transform:uppercase;background:var(--stamp);color:var(--on-stamp);border-radius:999px;padding:.12rem .6rem;align-self:center}
+
+/* Couleurs par type de pli (texte / fond), clair et sombre */
+:root{
+  --t-facture:#1d4ed8;--tb-facture:#dbe7ff;
+  --t-impots:#b3261e;--tb-impots:#fde1de;
+  --t-administratif:#475569;--tb-administratif:#e2e8f0;
+  --t-banque:#0b7a60;--tb-banque:#d3f0e6;
+  --t-assurance:#0e7490;--tb-assurance:#d0eef5;
+  --t-contrat:#6d28d9;--tb-contrat:#e9defc;
+  --t-juridique:#92400e;--tb-juridique:#fbe6cc;
+  --t-recommande:#c2410c;--tb-recommande:#ffe2d1;
+  --t-autre:#57534e;--tb-autre:#e7e5e4;
+}
+@media (prefers-color-scheme:dark){:root{
+  --t-facture:#93b4ff;--tb-facture:#1c2a52;
+  --t-impots:#ff9c94;--tb-impots:#4a1f1c;
+  --t-administratif:#b6c2d3;--tb-administratif:#2a3342;
+  --t-banque:#5fe0b6;--tb-banque:#10382d;
+  --t-assurance:#6fd6ee;--tb-assurance:#0f3340;
+  --t-contrat:#c4a8ff;--tb-contrat:#2f2255;
+  --t-juridique:#f2b27a;--tb-juridique:#40290f;
+  --t-recommande:#ffa57a;--tb-recommande:#4a2412;
+  --t-autre:#c2bcb6;--tb-autre:#34302d}}
+.t-facture{--tc:var(--t-facture);--tb:var(--tb-facture)}.t-impots{--tc:var(--t-impots);--tb:var(--tb-impots)}
+.t-administratif{--tc:var(--t-administratif);--tb:var(--tb-administratif)}.t-banque{--tc:var(--t-banque);--tb:var(--tb-banque)}
+.t-assurance{--tc:var(--t-assurance);--tb:var(--tb-assurance)}.t-contrat{--tc:var(--t-contrat);--tb:var(--tb-contrat)}
+.t-juridique{--tc:var(--t-juridique);--tb:var(--tb-juridique)}.t-recommande{--tc:var(--t-recommande);--tb:var(--tb-recommande)}
+.t-autre{--tc:var(--t-autre);--tb:var(--tb-autre)}
+.pli{border-left:5px solid var(--tc,var(--rule))}
+.badge.typebadge{background:var(--tc,var(--ink-2));color:var(--on-type,#fff);font:700 .76rem var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:.28rem .7rem;border-radius:6px}
+
+/* Onglets par type */
+.typetabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--rule);scrollbar-width:thin;margin:2px 0 4px}
+.ttab{font:600 .92rem var(--f-body);color:var(--ink-2);background:none;border:0;border-bottom:3px solid transparent;padding:.6rem .85rem;cursor:pointer;white-space:nowrap;display:inline-flex;gap:.5rem;align-items:center;margin-bottom:-1px;border-radius:8px 8px 0 0}
+.ttab:hover{background:var(--paper);color:var(--ink)}
+.ttab-n{font:500 .74rem var(--f-mono);background:var(--paper);border-radius:999px;padding:.05rem .45rem}
+.ttab[aria-selected=true]{color:var(--tc,var(--stamp));border-bottom-color:var(--tc,var(--stamp));background:var(--tb,var(--stamp-soft))}
+.ttab[aria-selected=true] .ttab-n{background:var(--tc,var(--stamp));color:#fff}
+.ttab:focus-visible{outline:2px solid var(--stamp);outline-offset:-2px}
+
+/* Suivi : tous / à traiter / traités */
+.seg{display:flex;gap:6px;flex-wrap:wrap;background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:5px;width:fit-content;max-width:100%}
+.seg-btn{font:700 .95rem var(--f-body);color:var(--ink-2);background:none;border:0;border-radius:8px;padding:.55rem 1.05rem;cursor:pointer;display:inline-flex;gap:.55rem;align-items:center}
+.seg-btn:hover{color:var(--ink)}
+.seg-btn:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+.seg-btn[aria-pressed=true]{background:var(--sheet);color:var(--ink);box-shadow:0 1px 3px rgba(21,29,54,.18)}
+.seg-todo[aria-pressed=true]{background:var(--warn-soft);color:var(--warn)}
+.seg-done[aria-pressed=true]{background:var(--scan-soft);color:var(--scan)}
+.seg-n{font:600 .78rem var(--f-mono);background:var(--paper);color:var(--ink);border-radius:999px;padding:.05rem .5rem}
+.seg-todo .seg-n{background:var(--warn);color:#fff}
+.seg-late{font-size:.74rem;font-weight:700;color:#fff;background:#b3261e;border-radius:4px;padding:.05rem .4rem}
+
+/* Filtres secondaires repliés */
+.morefilters summary{cursor:pointer;font-weight:600;font-size:.9rem;color:var(--ink-2);list-style:none;display:inline-flex;gap:.4rem;align-items:center}
+.morefilters summary::before{content:"+";font-family:var(--f-mono);font-weight:700}
+.morefilters[open] summary::before{content:"−"}
+.morefilters .filters{margin-top:10px}
+
+@media (prefers-color-scheme:dark){.badge.typebadge{--on-type:#0f1320}}

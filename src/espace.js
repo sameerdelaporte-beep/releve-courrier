@@ -325,8 +325,9 @@
   function mailPanel(box, opts) {
     var advanced = opts.advanced;
     var all = [];
-    var st = { q: '', type: '', status: '', period: '', folder: '', todo: false, sort: 'recent' };
-    var chipsBox = h('div', { class: 'chips', role: 'group', 'aria-label': 'Filtrer par type de document' });
+    var st = { q: '', type: '', status: '', period: '', folder: '', work: '', sort: 'recent' };
+    var chipsBox = h('div', { class: 'typetabs', role: 'tablist', 'aria-label': 'Types de courrier' });
+    var segBox = h('div', { class: 'seg', role: 'group', 'aria-label': 'Suivi des plis' });
     var listBox = h('div', {});
     var info = h('p', { class: 'muted', role: 'status', 'aria-live': 'polite' });
     var q = h('input', { type: 'search', placeholder: 'Rechercher : expéditeur, référence, contenu…', 'aria-label': 'Rechercher dans mes plis', maxlength: '100' });
@@ -340,16 +341,15 @@
     var sortSel = sel('Trier par', SORTS, 'sort');
     var folderSel = h('select', { 'aria-label': 'Dossier' }, [opt('', 'Tous les dossiers')]);
     folderSel.addEventListener('change', function () { st.folder = folderSel.value; render(); });
-    var todoBtn = h('button', { class: 'chip', type: 'button', 'aria-pressed': 'false', onclick: function () { st.todo = !st.todo; render(); } }, ['À traiter']);
     var form = h('form', { class: 'toolbar', role: 'search', novalidate: 'novalidate' }, [q, h('button', { class: 'btn btn-ghost btn-sm', type: 'submit' }, ['Rechercher'])]);
     form.addEventListener('submit', function (e) { e.preventDefault(); st.q = q.value.trim(); load(); });
     q.addEventListener('search', function () { if (!q.value && st.q) { st.q = ''; load(); } });
-    var filters = h('div', { class: 'filters' }, [statusSel, periodSel].concat(advanced ? [folderSel] : [], [sortSel]));
+    var filters = h('details', { class: 'morefilters' }, [h('summary', {}, ['Plus de filtres']), h('div', { class: 'filters' }, [statusSel, periodSel].concat(advanced ? [folderSel] : [], [sortSel]))]);
     var exportCsv = h('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, ['Exporter en CSV']);
     var exportZip = h('button', { class: 'btn btn-ghost btn-sm', type: 'button' }, ['Télécharger les PDF (ZIP)']);
     var exMsg = h('span', { class: 'muted', role: 'status' });
 
-    var card = h('div', { class: 'app-card' }, [h('h3', { text: 'Mes plis' }), form]);
+    var card = h('div', { class: 'app-card' }, [h('h3', { text: 'Mes plis' }), segBox, form]);
     if (advanced) card.appendChild(chipsBox);
     else card.appendChild(h('p', { class: 'hint lock' }, ['Classer par type (facture, impôts, banque…) et par dossier : ', h('a', { href: '/tarifs/' }, ['disponible avec la formule Pro']), '.']));
     card.appendChild(filters);
@@ -371,7 +371,8 @@
         if (st.type && it.doc_type !== st.type) return false;
         if (st.status && it.status !== st.status) return false;
         if (st.folder && it.folder !== st.folder) return false;
-        if (st.todo && !itemTodo(it)) return false;
+        if (st.work === 'todo' && !itemTodo(it)) return false;
+        if (st.work === 'done' && !(it.due_date && it.handled_at)) return false;
         if (st.period) { var age = -daysFrom(String(it.received_at).slice(0, 10)); if (age > Number(st.period)) return false; }
         return true;
       });
@@ -388,14 +389,25 @@
     function renderChips() {
       clear(chipsBox);
       var counts = {}; all.forEach(function (it) { counts[it.doc_type] = (counts[it.doc_type] || 0) + 1; });
-      function chip(label, value, n) {
+      function tab(label, value, n) {
         var on = st.type === value;
-        return h('button', { class: 'chip', type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: function () { st.type = value; render(); } }, [label + (n != null ? ' ' : ''), n != null ? h('span', { class: 'chip-n', text: String(n) }) : null]);
+        return h('button', { class: 'ttab' + (value ? ' t-' + value : ''), type: 'button', role: 'tab', 'aria-selected': on ? 'true' : 'false', onclick: function () { st.type = value; render(); } }, [h('span', { class: 'ttab-label', text: label }), h('span', { class: 'ttab-n', text: String(n) })]);
       }
-      chipsBox.appendChild(chip('Tous', '', all.length));
-      TYPE_ORDER.forEach(function (k) { if (counts[k]) chipsBox.appendChild(chip(DOC[k], k, counts[k])); });
-      todoBtn.setAttribute('aria-pressed', st.todo ? 'true' : 'false');
-      chipsBox.appendChild(todoBtn);
+      chipsBox.appendChild(tab('Tous', '', all.length));
+      TYPE_ORDER.forEach(function (k) { if (counts[k]) chipsBox.appendChild(tab(DOC[k], k, counts[k])); });
+    }
+
+    function renderSeg() {
+      clear(segBox);
+      var nTodo = all.filter(itemTodo).length, nDone = all.filter(function (it) { return it.due_date && it.handled_at; }).length;
+      var late = all.filter(function (it) { return itemTodo(it) && daysFrom(String(it.due_date).slice(0, 10)) < 0; }).length;
+      function seg(label, value, n, extra) {
+        return h('button', { class: 'seg-btn' + (extra ? ' ' + extra : ''), type: 'button', 'aria-pressed': st.work === value ? 'true' : 'false', onclick: function () { st.work = value; render(); } },
+          [label, n != null ? h('span', { class: 'seg-n', text: String(n) }) : null, (value === 'todo' && late) ? h('span', { class: 'seg-late', text: late + ' en retard' }) : null]);
+      }
+      segBox.appendChild(seg('Tous', '', null));
+      segBox.appendChild(seg('À traiter', 'todo', nTodo, 'seg-todo'));
+      segBox.appendChild(seg('Traités', 'done', nDone, 'seg-done'));
     }
 
     function renderFolders() {
@@ -415,7 +427,7 @@
     }
 
     function row(it) {
-      var meta = [h('span', { class: 'badge', text: DOC[it.doc_type] || it.doc_type })];
+      var meta = [h('span', { class: 'badge typebadge', text: DOC[it.doc_type] || it.doc_type })];
       if (it.folder) meta.push(h('span', { class: 'meta-folder', text: it.folder }));
       if (it.reference) meta.push(h('span', { class: 'meta-ref mono', text: it.reference }));
       var actions = [];
@@ -441,7 +453,7 @@
         });
         handled = h('label', { class: 'handled' }, [cb, ' Traité']);
       }
-      return h('li', { class: 'pli' }, [
+      return h('li', { class: 'pli t-' + it.doc_type }, [
         h('div', { class: 'pli-main' }, [
           h('div', { class: 'pli-title' }, [h('strong', { text: it.sender || 'Expéditeur inconnu' }), itemNew(it) ? h('span', { class: 'pill-new', text: 'Nouveau' }) : null, h('span', { class: 'pli-date', text: fmtDate(it.received_at) })]),
           h('div', { class: 'pli-meta' }, meta)
@@ -460,17 +472,17 @@
     }
 
     function render() {
-      if (advanced) { renderChips(); renderFolders(); }
+      renderSeg(); if (advanced) { renderChips(); renderFolders(); }
       statusSel.value = st.status; periodSel.value = st.period; sortSel.value = st.sort;
       var list = filtered();
-      var f = !!(st.q || st.type || st.status || st.period || st.folder || st.todo);
+      var f = !!(st.q || st.type || st.status || st.period || st.folder || st.work);
       info.textContent = all.length ? list.length + (list.length > 1 ? ' plis' : ' pli') + (f ? ' correspondant à vos filtres' : '') : '';
       clear(listBox);
       if (!list.length) {
         listBox.appendChild(h('div', { class: 'empty' }, [
           h('strong', { text: f ? 'Aucun pli ne correspond à ces filtres.' : 'Aucun pli pour le moment.' }),
           h('p', { class: 'muted', text: f ? 'Modifiez la recherche ou réinitialisez les filtres.' : 'Vos plis numérisés apparaîtront ici dès leur réception, sous 24 h ouvrées.' }),
-          f ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () { st.q = ''; st.type = ''; st.status = ''; st.period = ''; st.folder = ''; st.todo = false; q.value = ''; load(); } }, ['Réinitialiser les filtres']) : null
+          f ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: function () { st.q = ''; st.type = ''; st.status = ''; st.period = ''; st.folder = ''; st.work = ''; q.value = ''; load(); } }, ['Réinitialiser les filtres']) : null
         ]));
       } else listBox.appendChild(h('ul', { class: 'pli-list' }, list.map(row)));
       exportCsv.disabled = exportZip.disabled = !list.length;
