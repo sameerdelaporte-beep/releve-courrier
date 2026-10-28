@@ -228,6 +228,45 @@ ${li(['chaque rôle reçoit ce qui le concerne : finance, juridique, direction',
 <p>Les équipes à distance sont souvent celles qui utilisent déjà des agents IA. La formule Entreprise leur donne accès au courrier par API : voir <a href="/dematerialisation-courrier-agents-ia/">courrier papier pour agents IA</a>.</p>`,
   },
   {
+    path: '/pour/expatries-francais/', kind: 'service', service: 'Numérisation de courrier pour Français de l’étranger',
+    title: "Courrier de France numérisé pour expatriés | Relève",
+    desc: "Expatrié, vous gardez une adresse en France : Relève ouvre votre courrier, le scanne en PDF sous 24 h ouvrées et détruit l'original. Dès 9 €/mois.",
+    h1: 'Votre courrier de France, en PDF où que vous viviez', eyebrow: 'Pour qui : Français de l’étranger',
+    lead: "Impôts, banque, assurance, retraite : le courrier continue d'arriver en France alors que vous êtes à l'étranger. Relève l'ouvre, le numérise et vous le transmet en PDF.",
+    faq: ['arrivee', 'recommandes', 'valeurs', 'valeur'],
+    related: ['/reexpedition-courrier-numerique/', '/guides/domiciliation-ou-numerisation-courrier/', '/guides/recommande-absent-que-faire/', '/tarifs/'],
+    body: `
+<h2>Le problème de l'expatrié</h2>
+<p>Vous gardez des attaches en France : un compte bancaire, un bien immobilier, un contrat d'assurance, une caisse de retraite. Le courrier arrive chez vos parents, chez un ami ou dans une boîte aux lettres que personne ne relève. Il faut alors demander à un proche de l'ouvrir, de le photographier et de le renvoyer, avec les retards et la gêne que cela suppose.</p>
+<h2>Ce que fait Relève</h2>
+${steps(['Le courrier de votre adresse en France est <strong>réexpédié vers Relève</strong> (réexpédition La Poste) ou adressé directement à votre référence client.', 'Chaque pli est <strong>ouvert et scanné sous 24 heures ouvrées</strong>, en PDF avec texte reconnu.', 'Vous le recevez <strong>par email et dans votre espace client</strong>, avec la photo de l’enveloppe.', 'L’original est <strong>détruit avec une attestation</strong>, ou réexpédié si vous le demandez.'])}
+<h2>Ce que Relève n'est pas</h2>
+<p>Relève <strong>n'est pas une domiciliation</strong> : vous conservez votre adresse officielle et Relève ne peut pas servir d'adresse de résidence ni de siège social. Si vous vous demandez quelle solution vous convient, lisez notre guide <a href="/guides/domiciliation-ou-numerisation-courrier/">domiciliation ou numérisation</a>.</p>
+<h2>Les cas qui comptent à distance</h2>
+${li(['<strong>Recommandés :</strong> avec la procuration La Poste signée à l’inscription, nous les retirons et vous les numérisons, sans attendre un retour en France.', '<strong>Chèques, cartes bancaires, pièces d’identité :</strong> jamais détruits, signalés puis réexpédiés en lettre suivie.', '<strong>Originaux à conserver :</strong> actes, titres, contrats. Ils vous sont renvoyés ; la réexpédition à l’étranger est faite sur devis, frais postaux refacturés.', '<strong>Valeur du scan :</strong> un scan est une copie, sans valeur probante certifiée. Pour les démarches qui exigent l’original, demandez-le.'])}
+<h2>La formule adaptée</h2>
+<p>Un particulier reçoit en général moins de 30 plis par mois : la formule <strong>Essentiel</strong> (9 €/mois, 30 plis) suffit. Vous pouvez résilier à tout moment, avec effet à la fin du mois en cours.</p>`,
+  },
+  {
+    path: '/pour/nomades-numeriques-voyageurs/', kind: 'service', service: 'Numérisation de courrier pour voyageurs longue durée et nomades numériques',
+    title: "Courrier numérisé pour nomades et voyageurs | Relève",
+    desc: "Nomade numérique ou voyageur longue durée : votre courrier papier est ouvert, scanné en PDF sous 24 h ouvrées et détruit, où que vous soyez. Dès 9 €/mois.",
+    h1: 'Voyagez, votre courrier suit en PDF', eyebrow: 'Pour qui : nomades et voyageurs',
+    lead: "Quelques mois en Asie, un an en Amérique du Sud, ou une vie entre deux villes : le courrier papier ne doit pas décider de la date de votre retour.",
+    faq: ['arrivee', 'recommandes', 'resiliation', 'confidentiel'],
+    related: ['/reexpedition-courrier-numerique/', '/guides/domiciliation-ou-numerisation-courrier/', '/guides/recommande-absent-que-faire/', '/tarifs/'],
+    body: `
+<h2>Ce qui s'accumule pendant que vous voyagez</h2>
+<p>Avis d'imposition, courriers de la banque, amendes, convocations, factures : une partie du courrier a des échéances. Laisser une clé à un voisin ou à un parent fonctionne un temps, puis devient pesant pour tout le monde.</p>
+<h2>Une routine simple</h2>
+${steps(['Vous gardez votre adresse en France (domicile, famille) et <strong>faites suivre le courrier vers Relève</strong>.', 'Relève <strong>ouvre et numérise sous 24 heures ouvrées</strong> ; la publicité est détruite sans ouverture si vous le demandez.', 'Vous recevez les PDF <strong>par email</strong> et les retrouvez dans votre espace, de n’importe quel fuseau horaire.', 'Vous décidez pour chaque expéditeur : <strong>détruire</strong>, <strong>garder le PDF</strong> ou <strong>renvoyer l’original</strong>.'])}
+<h2>Pourquoi un abonnement mensuel convient</h2>
+<p>Vous partez peut-être six mois, peut-être deux ans. La formule mensuelle se résilie à tout moment, avec effet à la fin du mois en cours. Pensez à mettre fin en même temps à votre réexpédition La Poste.</p>
+<h2>Ce qu'il faut savoir avant de partir</h2>
+${li(['Relève <strong>n’est pas une domiciliation</strong> : il vous faut une adresse en France d’où faire suivre le courrier.', 'Les plis marqués « Personnel » ou « Confidentiel » peuvent rester fermés.', 'Chèques, cartes bancaires et pièces d’identité ne sont jamais détruits.', 'Le scan est une copie : gardez l’original des documents importants.'])}
+<p class="muted">Pour choisir entre domiciliation et numérisation : <a href="/guides/domiciliation-ou-numerisation-courrier/">le guide comparatif</a>. Pour les travailleurs indépendants : <a href="/pour/tpe-independants/">TPE et indépendants</a>.</p>`,
+  },
+  {
     path: '/guides/dematerialiser-courrier-papier/', kind: 'article',
     title: 'Dématérialiser son courrier papier : guide en 6 étapes',
     desc: "Passer du courrier papier au tout numérique en 6 étapes : inventaire, originaux à garder, adresse de réception, norme de scan, classement, conservation.",
@@ -281,6 +320,28 @@ ${li(['<strong>IBAN modifié :</strong> toute facture dont l’IBAN diffère de 
 <p>La Poste permet de désigner un mandataire pour retirer votre courrier, recommandés compris, avec une procuration. Avec Relève, vous signez cette procuration à l'inscription : nous retirons le recommandé, nous numérisons l'avis de réception et le contenu, et vous recevez le tout comme un pli ordinaire.</p>
 <h2>Que faire à réception du PDF ?</h2>
 ${steps(['Lisez le courrier et repérez la date limite éventuelle.', 'Transmettez-le à la personne concernée : comptable, avocat, dirigeant.', 'Si l’original est nécessaire, demandez sa réexpédition depuis votre espace.'])}`,
+  },
+  {
+    path: '/guides/domiciliation-ou-numerisation-courrier/', kind: 'article',
+    title: 'Domiciliation ou numérisation : la différence | Relève',
+    desc: "Domiciliation et numérisation de courrier ne répondent pas au même besoin. Ce que fait chacune, ce qu'elle ne fait pas, et comment choisir.",
+    h1: 'Domiciliation ou numérisation du courrier : quelle différence ?', eyebrow: 'Guide',
+    lead: "Les deux services manipulent votre courrier, mais l'un vous donne une adresse, l'autre traite ce qui arrive à l'adresse que vous avez déjà. Les confondre mène à un mauvais choix.",
+    faq: ['domiciliation', 'arrivee'], related: ['/reexpedition-courrier-numerique/', '/pour/expatries-francais/', '/guides/', '/tarifs/'],
+    body: `
+<h2>En une phrase</h2>
+<p>La <strong>domiciliation</strong> fournit une adresse officielle (siège social d'une société, par exemple). La <strong>numérisation</strong> traite le courrier reçu à une adresse que vous possédez déjà : elle l'ouvre, le scanne et le transmet. Relève fait de la numérisation, pas de la domiciliation.</p>
+<h2>Comparaison</h2>
+${table(['', 'Domiciliation', 'Numérisation (Relève)'], [['Ce que vous obtenez', 'Une adresse pour votre siège ou votre résidence administrative', 'Le contenu de votre courrier en PDF'], ['Adresse officielle', 'Fournie par le domiciliataire', 'Vous gardez la vôtre'], ['Siège social', 'Oui, c’est son objet', 'Non, impossible'], ['Numérisation', 'Parfois en option ou limitée', 'Cœur du service, sous 24 h ouvrées'], ['Destruction de l’original', 'Variable selon le prestataire', 'Attestation pour chaque pli détruit'], ['Cadre', 'Activité réglementée, avec agrément préfectoral', 'Service de traitement de courrier'], ['Pour qui', 'Créateurs d’entreprise, sociétés sans local', 'Indépendants, TPE, expatriés, voyageurs']])}
+<h2>Quand choisir une domiciliation</h2>
+${li(['Vous créez une société et n’avez pas de local pour y fixer le siège.', 'Vous ne voulez pas afficher votre adresse personnelle dans les registres.', 'Vous avez besoin d’une adresse administrative stable, distincte de votre domicile.'])}
+<h2>Quand choisir la numérisation</h2>
+${li(['Vous avez déjà une adresse (domicile, bureau, famille) et le problème est de traiter le courrier, pas de le recevoir.', 'Vous êtes en déplacement, à l’étranger ou en télétravail et personne n’ouvre le courrier.', 'Vous voulez que les factures arrivent chez le comptable sans que vous les touchiez.'])}
+<h2>Peut-on cumuler les deux ?</h2>
+<p>Oui, ce sont deux besoins différents : une société peut avoir son siège chez un domiciliataire et vouloir que le courrier soit ensuite numérisé et classé. Selon son contrat, le domiciliataire peut réexpédier le courrier vers un service de numérisation ; demandez-lui avant de souscrire.</p>
+<div class="callout info" role="note"><span aria-hidden="true">i</span><p><strong>À retenir :</strong> l'adresse c/o Relève ne peut pas servir de siège social ni d'adresse d'immatriculation.</p></div>
+<h2>Les questions à se poser</h2>
+${steps(['Ai-je une adresse officielle que je peux garder ? Si non, il vous faut d’abord une domiciliation.', 'Le courrier reçu est-il ouvert à temps ? Si non, la numérisation répond au problème.', 'Ai-je besoin de l’original papier de certains documents ? Dans ce cas, il doit vous être renvoyé, jamais détruit.'])}`,
   },
 ];
 

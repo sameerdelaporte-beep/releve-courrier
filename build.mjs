@@ -43,12 +43,15 @@ const LABEL = {
   '/pour/tpe-independants/': 'TPE et indépendants',
   '/pour/cabinets-comptables-juridiques/': 'Cabinets comptables et juridiques',
   '/pour/entreprises-en-teletravail/': 'Équipes à distance',
+  '/pour/expatries-francais/': 'Français de l’étranger',
+  '/pour/nomades-numeriques-voyageurs/': 'Nomades et voyageurs',
   '/tarifs/': 'Tarifs',
   '/faq/': 'Questions fréquentes',
   '/guides/': 'Guides',
   '/guides/dematerialiser-courrier-papier/': 'Dématérialiser son courrier papier',
   '/guides/automatiser-traitement-facture-papier-agent-ia/': 'Automatiser une facture papier avec un agent IA',
   '/guides/recommande-absent-que-faire/': 'Recommandé en votre absence',
+  '/guides/domiciliation-ou-numerisation-courrier/': 'Domiciliation ou numérisation',
   '/mentions-legales/': 'Mentions légales',
   '/cgv/': 'Conditions générales de vente',
   '/confidentialite/': 'Politique de confidentialité',
@@ -73,8 +76,8 @@ function footer() {
 <div class="foot">
 <div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">R</span>${BRAND}</a><p class="note">Votre courrier papier devient une donnée : ouvert, numérisé sous 24 h ouvrées, puis détruit ou réexpédié.</p><p class="note"><a href="mailto:${cfg.contactEmail}">${cfg.contactEmail}</a></p></div>
 ${col('Services', ['/numerisation-courrier-entreprise/', '/scan-courrier-par-email/', '/dematerialisation-courrier-agents-ia/', '/destruction-courrier-confidentiel/', '/reexpedition-courrier-numerique/'])}
-${col('Pour qui', ['/pour/tpe-independants/', '/pour/cabinets-comptables-juridiques/', '/pour/entreprises-en-teletravail/'])}
-${col('Ressources', ['/tarifs/', '/guides/', '/guides/recommande-absent-que-faire/', '/faq/'])}
+${col('Pour qui', ['/pour/tpe-independants/', '/pour/cabinets-comptables-juridiques/', '/pour/entreprises-en-teletravail/', '/pour/expatries-francais/', '/pour/nomades-numeriques-voyageurs/'])}
+${col('Ressources', ['/tarifs/', '/guides/', '/guides/recommande-absent-que-faire/', '/guides/domiciliation-ou-numerisation-courrier/', '/faq/'])}
 </div>
 <div class="foot-bottom"><span>© 2026 ${BRAND}</span><span><a href="/mentions-legales/">Mentions légales</a> · <a href="/cgv/">CGV</a> · <a href="/confidentialite/">Confidentialité</a></span></div>
 </div></footer>`;
@@ -542,10 +545,10 @@ ${['/numerisation-courrier-entreprise/', '/scan-courrier-par-email/', '/demateri
 - [Détail des tarifs](${SITE}/tarifs/)
 
 ## Pour qui
-${['/pour/tpe-independants/', '/pour/cabinets-comptables-juridiques/', '/pour/entreprises-en-teletravail/'].map((x) => `- [${LABEL[x]}](${SITE}${x})`).join('\n')}
+${['/pour/tpe-independants/', '/pour/cabinets-comptables-juridiques/', '/pour/entreprises-en-teletravail/', '/pour/expatries-francais/', '/pour/nomades-numeriques-voyageurs/'].map((x) => `- [${LABEL[x]}](${SITE}${x})`).join('\n')}
 
 ## Ressources
-${['/guides/dematerialiser-courrier-papier/', '/guides/automatiser-traitement-facture-papier-agent-ia/', '/guides/recommande-absent-que-faire/', '/faq/'].map((x) => `- [${LABEL[x]}](${SITE}${x})`).join('\n')}
+${['/guides/dematerialiser-courrier-papier/', '/guides/automatiser-traitement-facture-papier-agent-ia/', '/guides/recommande-absent-que-faire/', '/guides/domiciliation-ou-numerisation-courrier/', '/faq/'].map((x) => `- [${LABEL[x]}](${SITE}${x})`).join('\n')}
 
 ## Limites
 - ${BRAND} n'est pas une domiciliation : le siège social reste à l'adresse du client.
