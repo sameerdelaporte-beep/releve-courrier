@@ -58,8 +58,9 @@ Deno.serve(async (req) => {
 
   const lines = [
     "Relève Courrier atteste que l'original papier du pli désigné ci-dessus a été",
-    "numérisé, puis détruit. Cette attestation est établie par Relève ; elle n'est pas",
-    "délivrée par un organisme tiers et ne vise aucun niveau de sécurité normalisé.",
+    "numérisé, puis déchiré et déposé dans un conteneur sécurisé de collecte pour",
+    "destruction. Cette attestation est établie par Relève ; elle n'est pas délivrée",
+    "par un organisme tiers et ne vise aucun niveau de sécurité normalisé.",
     "Une copie numérique est conservée dans l'espace client pendant la durée",
     "prévue par la formule d'abonnement du client.",
   ];

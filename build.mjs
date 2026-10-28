@@ -323,7 +323,7 @@ ${`<div class="tablewrap"><table><thead><tr><th scope="col">Fonction</th>${PLANS
 <section class="tight"><div class="wrap page-body"><h2>Questions sur les tarifs</h2><div class="gap"></div>${faqHtml(faqKeys)}</div></section>
 ${relatedHtml(['/numerisation-courrier-entreprise/', '/reexpedition-courrier-numerique/', '/faq/'])}`;
   const prod = PLANS.map((pl) => ({
-    '@type': 'Product', name: `Relève ${pl.name}`, description: `${pl.quota} plis numérisés par mois. ${pl.for}.`, brand: { '@type': 'Brand', name: BRAND }, url: SITE + p,
+    '@type': 'Service', serviceType: 'Numérisation de courrier', name: `Relève ${pl.name}`, description: `${pl.quota} plis numérisés par mois. ${pl.for}.`, provider: { '@id': ORG_ID }, areaServed: { '@type': 'Country', name: 'France' }, url: SITE + p,
     offers: [
       { '@type': 'Offer', name: `${pl.name} mensuel`, priceCurrency: 'EUR', price: String(pl.month), priceSpecification: { '@type': 'UnitPriceSpecification', price: pl.month, priceCurrency: 'EUR', unitCode: 'MON', valueAddedTaxIncluded: true }, availability: 'https://schema.org/InStock', url: SITE + p },
       { '@type': 'Offer', name: `${pl.name} annuel`, priceCurrency: 'EUR', price: String(pl.year), priceSpecification: { '@type': 'UnitPriceSpecification', price: pl.year, priceCurrency: 'EUR', unitCode: 'ANN', valueAddedTaxIncluded: true }, availability: 'https://schema.org/InStock', url: SITE + p },
