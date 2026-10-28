@@ -51,7 +51,7 @@ export const FAQ = {
   quota: ['Que se passe-t-il si je dépasse mon nombre de plis ?', "Les plis au-delà du quota sont facturés à l'unité, au tarif indiqué dans votre formule (de 0,25 € à 0,50 €). Vous pouvez changer de formule à tout moment depuis votre espace."],
   resiliation: ['Puis-je résilier quand je veux ?', "Oui. En formule mensuelle, la résiliation prend effet à la fin du mois en cours. Pensez à mettre fin en même temps à votre service de réexpédition La Poste."],
   valeur: ['Les scans ont-ils une valeur juridique ?', "Un scan est une copie : sa force probante dépend du document et de l'usage que vous en faites. Relève ne propose pas d'archivage à valeur probante certifiée. Pour les actes, titres et contrats dont vous devez conserver l'original, choisissez la réexpédition de l'original."],
-  rgpd: ['Mes données sont-elles protégées ?', "Les fichiers sont chiffrés au repos et en transit, hébergés dans l'Union européenne, et les dates de réception, de numérisation, d'envoi et de destruction sont visibles dans votre espace. Un accord de traitement des données (RGPD) est signé avec chaque client professionnel. La durée de conservation dépend de votre formule, et vous pouvez demander l'export ou la suppression de vos données."],
+  rgpd: ['Mes données sont-elles protégées ?', "Les fichiers sont chiffrés au repos et en transit, hébergés dans l'Union européenne, et les dates de réception, de numérisation, d'envoi et de destruction sont visibles dans votre espace. Un accord de traitement des données (RGPD) est disponible sur demande. La durée de conservation dépend de votre formule, et vous pouvez demander l'export ou la suppression de vos données."],
   ia: ['Puis-je connecter mes agents IA à mon courrier ?', "Oui, avec la formule Entreprise : un webhook vous notifie à chaque nouveau pli et une API donne accès au PDF et aux données extraites (expéditeur, type, montant, échéance, références). Vous gardez la main sur ce que chaque agent peut lire."],
   valeurs: ['Que faites-vous des chèques et des pièces d’identité ?', "Ils ne sont jamais détruits. Le pli est numérisé, signalé dans votre espace, puis réexpédié en lettre suivie à l'adresse que vous indiquez."],
   confidentiel: ['Mon courrier peut-il rester fermé ?', "Oui. Vous pouvez demander que les plis portant la mention « Personnel » ou « Confidentiel », ou venant d'expéditeurs que vous désignez, ne soient jamais ouverts. Ils sont alors réexpédiés fermés ou détruits fermés, selon votre choix."],
@@ -117,7 +117,7 @@ ${steps(['Choisissez une formule sur la page <a href="/tarifs/">tarifs</a>.', 'I
 <h2>Le courrier papier, dernier trou dans l'automatisation</h2>
 <p>Vos factures, relevés et courriers administratifs arrivent encore en papier. Tant qu'ils restent dans une boîte aux lettres, vos agents IA ne peuvent ni les lire, ni relancer, ni payer, ni classer. Relève comble ce trou : le papier entre d'un côté, de la donnée sort de l'autre.</p>
 <h2>Ce que reçoivent vos agents</h2>
-${li(['le PDF du pli, avec texte reconnu', 'le type de document, l’expéditeur, la date d’émission', 'les montants, échéances, références de contrat ou de facture, IBAN quand ils figurent sur le document', 'l’état du pli : numérisé, envoyé, original détruit, certificat de destruction'])}
+${li(['le PDF du pli, avec texte reconnu', 'le type de document, l’expéditeur, la date d’émission', 'les montants, échéances, références de contrat ou de facture, IBAN quand ils figurent sur le document', 'l’état du pli : numérisé, envoyé, original détruit, attestation de destruction'])}
 <div class="two">
 <div class="prose"><h2>Un webhook à chaque pli, une API pour l'historique</h2>${li(['webhook signé envoyé dès que le pli est numérisé', 'API pour retrouver un pli, son PDF et ses données', 'clé d’API personnelle, régénérable à tout moment depuis votre espace', 'lien de téléchargement du PDF valable quelques minutes'])}</div>
 <pre class="code" aria-label="Exemple de données transmises pour un pli"><span class="k">{</span>
@@ -143,12 +143,12 @@ ${li(['<strong>Agent comptable :</strong> rapproche chaque facture papier du bon
     title: 'Destruction de courrier confidentiel avec attestation | Relève',
     desc: "Après numérisation, l'original est détruit et vous recevez une attestation de destruction horodatée. Destruction sans ouverture possible.",
     h1: 'Destruction de courrier confidentiel, avec attestation', eyebrow: 'Destruction attestée',
-    lead: "Le papier ne traîne pas. Une fois le pli numérisé, l'original est détruit le jour même et vous recevez l'attestation de sa destruction dans votre espace.",
+    lead: "Le papier ne traîne pas. Une fois le pli numérisé, l'original est détruit après contrôle du scan et vous recevez l'attestation de sa destruction dans votre espace.",
     faq: ['original', 'valeurs', 'confidentiel', 'rgpd'],
     related: ['/numerisation-courrier-entreprise/', '/reexpedition-courrier-numerique/', '/pour/cabinets-comptables-juridiques/', '/faq/'],
     body: `
 <h2>Trois façons de détruire</h2>
-${table(['Situation', 'Ouverture', 'Numérisation', 'Destruction'], [['Courrier normal', 'Oui', 'Oui', 'Après le scan, le jour même'], ['Publicité et prospectus', 'Non', 'Non', 'Détruit fermé'], ['Pli « Personnel » ou « Confidentiel »', 'Selon votre règle', 'Selon votre règle', 'Fermé : réexpédié ou détruit fermé'], ['Contrat ou acte à conserver en original', 'Oui', 'Oui', 'Aucune : l’original vous est renvoyé']])}
+${table(['Situation', 'Ouverture', 'Numérisation', 'Destruction'], [['Courrier normal', 'Oui', 'Oui', 'Après contrôle du scan, par lot'], ['Publicité et prospectus', 'Non', 'Non', 'Détruit fermé'], ['Pli « Personnel » ou « Confidentiel »', 'Selon votre règle', 'Selon votre règle', 'Fermé : réexpédié ou détruit fermé'], ['Contrat ou acte à conserver en original', 'Oui', 'Oui', 'Aucune : l’original vous est renvoyé']])}
 <h2>Comment l'original est détruit</h2>
 ${li(['destruction du papier par Relève, sans niveau de sécurité normalisé (pas de certification DIN 66399)', 'destruction par lot, après contrôle de la qualité du scan', 'attestation de destruction horodatée (DST-AAAA-NNNN), établie par Relève et non par un organisme tiers, ajoutée à votre espace', 'dates de réception, numérisation, envoi et destruction visibles dans votre espace'])}
 <h2>Un original détruit n'est jamais « perdu »</h2>
@@ -207,7 +207,7 @@ ${table(['Expéditeur', 'Action'], [['Fournisseurs', 'PDF au cabinet comptable, 
 ${li(['une règle de traitement par client ou par expéditeur', 'classement automatique par dossier et par type de document', 'PDF avec texte recherchable pour retrouver une pièce par mot-clé', 'jusqu’à 5 utilisateurs en formule Pro, illimité en formule Entreprise'])}
 <h2>Confidentialité et traçabilité</h2>
 <p>Le courrier est ouvert par l'exploitant de Relève, tenu au secret de la correspondance. Les plis marqués « Personnel » ou « Confidentiel », ou venant d'expéditeurs que vous désignez, restent fermés. Les dates de réception, de numérisation, d'envoi et de destruction sont visibles dans votre espace.</p>
-<div class="callout info" role="note"><span aria-hidden="true">i</span><p><strong>Secret professionnel :</strong> si votre profession y est soumise, définissez avec nous les règles de traitement avant de rediriger le courrier. Un accord de traitement des données (RGPD) est signé avec chaque cabinet.</p></div>
+<div class="callout info" role="note"><span aria-hidden="true">i</span><p><strong>Secret professionnel :</strong> si votre profession y est soumise, définissez avec nous les règles de traitement avant de rediriger le courrier. Un accord de traitement des données (RGPD) est disponible sur demande.</p></div>
 <h2>Pour les cabinets qui automatisent</h2>
 <p>Avec la formule Entreprise, un webhook et une API donnent à vos outils ou à vos agents IA accès aux plis et à leurs données extraites. Voir <a href="/dematerialisation-courrier-agents-ia/">courrier papier pour agents IA</a>.</p>`,
   },

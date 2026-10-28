@@ -261,7 +261,7 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
   <span class="k">"montant_ttc":</span> <span class="n">184.36</span>,
   <span class="k">"echeance":</span> <span class="v">"2026-10-23"</span>,
   <span class="k">"original":</span> <span class="v">"detruit"</span>,
-  <span class="k">"certificat":</span> <span class="v">"DST-2026-0412"</span>
+  <span class="k">"attestation":</span> <span class="v">"DST-2026-0412"</span>
 <span class="k">}</span></pre>
 </div></section>
 
@@ -279,7 +279,7 @@ ${features ? `<ul>${pl.feat.map((f) => `<li><span>${f}</span></li>`).join('')}</
 <section id="securite"><div class="wrap">
 <div class="sec-head"><p class="eyebrow">Confidentialité</p><h2>Votre courrier ne traîne nulle part</h2><p class="lead">Le papier reste le moins longtemps possible entre nos mains, et chaque manipulation laisse une trace que vous pouvez consulter.</p></div>
 <div class="grid g3">
-${[['24 h ouvrées', 'Numérisé dès réception', 'Boîte aux lettres relevée chaque jour ouvré. Votre pli est numérisé au plus tard le jour ouvré suivant.'], ['Attestation', 'Destruction attestée', 'L’original est détruit juste après numérisation. Une attestation de destruction horodatée, établie par Relève, rejoint votre espace. Elle n’est pas délivrée par un organisme tiers et ne vise aucun niveau de sécurité normalisé.'], ['Un seul opérateur', 'Une seule personne ouvre', 'Le courrier est ouvert et numérisé par l’exploitant de Relève, tenu au secret de la correspondance et à la confidentialité.'], ['Suivi', 'Les étapes sont datées', 'Réception, numérisation, envoi et destruction : les dates sont visibles dans votre espace.'], ['Chiffrement', 'Stockage chiffré', 'Fichiers chiffrés au repos et en transit, hébergés dans l’Union européenne. La durée de conservation dépend de votre formule.'], ['RGPD', 'Contrat de sous-traitance', 'Un accord de traitement des données est signé avec chaque client professionnel. Export ou suppression sur demande.']].map(([e, t, d]) => `<article class="item"><p class="eyebrow">${e}</p><h3>${t}</h3><p>${d}</p></article>`).join('')}
+${[['24 h ouvrées', 'Numérisé dès réception', 'Boîte aux lettres relevée chaque jour ouvré. Votre pli est numérisé au plus tard le jour ouvré suivant.'], ['Attestation', 'Destruction attestée', 'L’original est détruit après contrôle de la numérisation. Une attestation de destruction horodatée, établie par Relève, rejoint votre espace. Elle n’est pas délivrée par un organisme tiers et ne vise aucun niveau de sécurité normalisé.'], ['Un seul opérateur', 'Une seule personne ouvre', 'Le courrier est ouvert et numérisé par l’exploitant de Relève, tenu au secret de la correspondance et à la confidentialité.'], ['Suivi', 'Les étapes sont datées', 'Réception, numérisation, envoi et destruction : les dates sont visibles dans votre espace.'], ['Chiffrement', 'Stockage chiffré', 'Fichiers chiffrés au repos et en transit, hébergés dans l’Union européenne. La durée de conservation dépend de votre formule.'], ['RGPD', 'Contrat de sous-traitance', 'Un accord de traitement des données est signé avec chaque client professionnel. Export ou suppression sur demande.']].map(([e, t, d]) => `<article class="item"><p class="eyebrow">${e}</p><h3>${t}</h3><p>${d}</p></article>`).join('')}
 </div></div></section>
 
 <section id="faq" class="band"><div class="wrap">
