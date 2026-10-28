@@ -211,13 +211,15 @@
         ]));
       } else {
         body.appendChild(accountCard(c));
-        body.appendChild(prefsCard(c));
-        if (c.plan === 'entreprise' && active) body.appendChild(apiCard(c));
-        if (advanced && active) { body.appendChild(rulesCard(c)); body.appendChild(teamCard(c)); }
       }
       var itemsBox = h('div', { class: 'app-card' });
       body.appendChild(itemsBox);
       itemsPanel(itemsBox, advanced);
+      if (!member) {
+        if (advanced && active) { body.appendChild(rulesCard(c)); body.appendChild(teamCard(c)); }
+        if (c.plan === 'entreprise' && active) body.appendChild(apiCard(c));
+        body.appendChild(prefsCard(c));
+      }
     }).catch(function () {
       clear(body); body.appendChild(h('p', { class: 'note', text: 'Impossible de charger vos données. Réessayez dans un instant.' }));
     });
